@@ -1,7 +1,7 @@
 const request = require('supertest');
-const app = require('./index.js');
+const app = require('./index');
 
-jest.useFakeTimers();
+
 
 describe('API Endpoints', () => {
   it('should return a 200 status code for a GET request to /api', async () => {
@@ -12,3 +12,4 @@ describe('API Endpoints', () => {
 
   // Add more test cases for your other endpoints
 });
+
