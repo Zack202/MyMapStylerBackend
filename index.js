@@ -49,6 +49,9 @@ db.on('error', (error) => {
 db.once('open', () => {
   console.log('Connected to MongoDB Atlas');
 
+  app.get('/', (req,res) => {	
+    res.send('Welcome to My Map Styler API!');	
+  })
 // PUT THE SERVER IN LISTENING MODE
 app.listen(PORT, () => {console.log(`Server running on port ${PORT}`);
 });
