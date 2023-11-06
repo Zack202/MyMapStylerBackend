@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - DeployedBranch
+      - main
 
 jobs:
   deploy:

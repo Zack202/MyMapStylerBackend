@@ -24,8 +24,8 @@ app.use(cookieParser());
 // SETUP OUR OWN ROUTERS AS MIDDLEWARE
 const authRouter = require('./routes/auth-router');
 app.use('/auth', authRouter);
-const playlistsRouter = require('./routes/map-router');
-app.use('/api', playlistsRouter);
+const mapsRouter = require('./routes/map-router');
+app.use('/api', mapsRouter);
 
 // Connect to MongoDB Atlas using mongoose
 
