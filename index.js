@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({
   origin: [
     'http://localhost:3000', 
-    'https://my-map-styler-frontend-60bea3c51be3.herokuapp.com/', 
+    'https://my-map-styler-frontend-60bea3c51be3.herokuapp.com', 
   ],
   credentials: true,
 }));
