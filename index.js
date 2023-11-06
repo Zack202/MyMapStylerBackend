@@ -47,9 +47,6 @@ db.on('error', (error) => {
 db.once('open', () => {
   console.log('Connected to MongoDB Atlas');
 });
-app.get('/', (req,res) => {
-  res.send('Welcome to Daily Code Buffer in Heroku Auto Deployment!!');
-})
 // PUT THE SERVER IN LISTENING MODE
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
