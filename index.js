@@ -29,6 +29,13 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
+  dbName: 'Test_User',
+}, (error) => {
+  if (error) {
+    console.error('MongoDB connection error:', error);
+  } else {
+    console.log('Connected to MongoDB Atlas');
+  }
 });
 
 const db = mongoose.connection;
@@ -40,6 +47,11 @@ db.on('error', (error) => {
 db.once('open', () => {
   console.log('Connected to MongoDB Atlas');
 });
-
+app.get('/', (req,res) => {
+  res.send('Welcome to Daily Code Buffer in Heroku Auto Deployment!!');
+})
 // PUT THE SERVER IN LISTENING MODE
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+module.exports = app;

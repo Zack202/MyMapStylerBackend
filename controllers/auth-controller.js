@@ -2,6 +2,28 @@ const auth = require('../auth')
 const User = require('../models/user-model')
 const bcrypt = require('bcryptjs')
 
+makeDummy = async (req, res) => {
+    const { userName, firstName, lastName, email, password, passwordVerify } = { userName: "word", firstName: "word", lastName: "word", email: "word", password: "word", passwordVerify: "word"}
+    console.log("create user: " + userName + " " + firstName + " " + lastName + " " + email + " " + password + " " + passwordVerify);
+    try{
+        const saltRounds = 10;
+        const salt = await bcrypt.genSalt(saltRounds);
+        const passwordHash = await bcrypt.hash(password, salt);
+        console.log("passwordHash: " + passwordHash);
+
+        const newUser = new User({
+            userName, firstName, lastName, email, passwordHash, 
+        });
+        const savedUser = await newUser.save();
+        console.log("new user saved: " + savedUser._id);
+
+        res.status(200).json({ message: 'Dummy data created' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send();
+    }
+}
+
 getLoggedIn = async (req, res) => {
     try {
         let userId = auth.verifyUser(req);
@@ -187,5 +209,6 @@ module.exports = {
     getLoggedIn,
     registerUser,
     loginUser,
-    logoutUser
+    logoutUser,
+    makeDummy
 }
