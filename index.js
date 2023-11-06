@@ -11,10 +11,17 @@ const app = express();
 
 // SETUP THE MIDDLEWARE
 app.use(express.urlencoded({ extended: true }));
+if (process.env.NODE_ENV === 'development') {
 app.use(cors({
     origin: ["http://localhost:3000"],
     credentials: true
 }));
+} else if (process.env.NODE_ENV === 'production') {
+app.use(cors({
+    origin: ["https://my-map-styler-backend-79df2eb36474.herokuapp.com/"],
+    credentials: true
+}));
+}
 app.use(express.json());
 app.use(cookieParser());
 
