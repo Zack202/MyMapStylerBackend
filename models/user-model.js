@@ -11,7 +11,7 @@ const UserSchema = new Schema(
         passwordHash: { type: String, required: true },
         playlists: [{type: ObjectId, ref: 'Playlist'}]
     },
-    { timestamps: true,  collection: 'Users' },
+    { timestamps: true,  collection: 'UsersList' },
 )
 
 module.exports = mongoose.model('User', UserSchema)

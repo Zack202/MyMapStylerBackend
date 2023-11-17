@@ -34,7 +34,7 @@ if (require.main === module) {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
-    dbName: 'Test_User',
+    dbName: 'My_Map_Styler',
   }, (error) => {
     if (error) {
       console.error('MongoDB connection error:', error);
