@@ -127,3 +127,70 @@ describe('Create New Account Tests', () => {
           expect(response2.body.errorMessage).toBe("An account with this user name already exists.");
           });
   });
+
+describe('Login Tests', () => {
+
+  test('should login for a Get request to /auth/login READ TEST', async () => {
+    const accountToAdd = {
+      firstName: 'john',
+      lastName: 'doe',
+      userName: 'johndoe',
+      email: 'john@gmail.com',
+      password: 'password',
+      confirmPassword: 'password'};
+
+  const response1 = await request(app).post('/auth/register').send(accountToAdd);
+  expect(response1.statusCode).toBe(201);
+
+    const accountToLogin = {
+      email: 'john@gmail.com',
+      password: 'password'
+    }
+    const response2 = await request(app).get('/auth/login').send(accountToLogin);
+    expect(response2.statusCode).toBe(200);
+    expect(response2.body.success).toBe(true);
+    expect(response2.body.user.email).toBe(accountToLogin.email);
+  });
+
+  test('should not login (missing fields) for a Get request to /auth/login READ TEST', async () => {
+    const accountToAdd = {
+      firstName: 'john',
+      lastName: 'doe',
+      userName: 'johndoe',
+      email: 'john@gmail.com',
+      password: 'password',
+      confirmPassword: 'password'};
+
+  const response1 = await request(app).post('/auth/register').send(accountToAdd);
+  expect(response1.statusCode).toBe(201);
+
+    const accountToLogin = {
+      email: 'john@gmail.com'
+    }
+    const response2 = await request(app).get('/auth/login').send(accountToLogin);
+    expect(response2.statusCode).toBe(400);
+    expect(response2.body.errorMessage).toBe("Please enter all required fields.");
+  });
+
+  test('should not login (wrong combo) for a Get request to /auth/login READ TEST', async () => {
+    const accountToAdd = {
+      firstName: 'john',
+      lastName: 'doe',
+      userName: 'johndoe',
+      email: 'john@gmail.com',
+      password: 'password',
+      confirmPassword: 'password'};
+
+  const response1 = await request(app).post('/auth/register').send(accountToAdd);
+  expect(response1.statusCode).toBe(201);
+
+    const accountToLogin = {
+      email: 'john@gmail.com',
+      password: 'password123'
+    }
+    const response2 = await request(app).get('/auth/login').send(accountToLogin);
+    expect(response2.statusCode).toBe(401);
+    expect(response2.body.errorMessage).toBe("Wrong email or password provided.");
+    
+  });
+});
