@@ -193,4 +193,16 @@ describe('Login Tests', () => {
     expect(response2.body.errorMessage).toBe("Wrong email or password provided.");
     
   });
+
+
+  describe('Logout Tests', () => {
+      
+      test('should logout for a Get request to /auth/logout READ TEST', async () => {
+        
+        const response = await request(app).get('/auth/logout');
+        expect(response.statusCode).toBe(200);
+        //Check cookie is cleared
+        expect(response.headers['set-cookie'][0]).toBe("token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=None");
+      });
+  });
 });
