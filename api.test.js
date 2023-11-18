@@ -205,4 +205,39 @@ describe('Login Tests', () => {
         expect(response.headers['set-cookie'][0]).toBe("token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=None");
       });
   });
+
+  describe('Get Logged In Tests', () => {
+      
+    test('should check if user is logged in for a Get request to /auth/loggedIn READ TEST', async () => {
+      const accountToAdd = {
+        firstName: 'john',
+        lastName: 'doe',
+        userName: 'johndoe',
+        email: 'john@gmail.com',
+        password: 'password',
+        confirmPassword: 'password'};
+  
+    const response1 = await request(app).post('/auth/register').send(accountToAdd);
+    expect(response1.statusCode).toBe(201);
+  
+    const accountToLogin = {
+      email: 'john@gmail.com',
+      password: 'password'
+    }
+    const response2 = await request(app).get('/auth/login').send(accountToLogin);
+    expect(response2.statusCode).toBe(200);
+
+    const cookies = response2.header['set-cookie'];
+
+    const response3 = await request(app).get('/auth/loggedIn').set('Cookie', cookies).send();
+    expect(response3.body.loggedIn).toBe(true);
+    });
+
+    test('should check and fail (different users or not logged in) if user is logged in for a Get request to /auth/loggedIn READ TEST', async () => {
+      const response = await request(app).get('/auth/loggedIn').send();
+  
+      expect(response.statusCode).toBe(401);
+      expect(response.body.loggedIn).toBe(false);
+    });
+});
 });
