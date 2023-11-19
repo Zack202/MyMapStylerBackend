@@ -2,45 +2,52 @@ const { listenerCount } = require('../models/map-model');
 const Map = require('../models/map-model')
 const User = require('../models/user-model');
 
-createNewName = (req, res) => {
-    const name = req.params.name;
-    console.log("Create new name: " + name);
+createNewMap = async (req, res) => {
+    const body = req.body;
+    console.log("createMap body: " + JSON.stringify(body));
 
-    const newName = new Map({ name });
-
-    newName.save()
-        .then((savedName) => {
-            return res.status(201).json({
-                success: true,
-                id: savedName._id,
-                message: 'Name created!',
-            });
+    if (Object.keys(body).length === 0) {
+        return res.status(400).json({
+            success: false,
+            errorMessage: 'You must provide a Map',
         })
-        .catch(error => {
-            return res.status(400).json({
-                error,
-                message: 'Name not created!',
+    }
+
+    const map = new Map(body);
+    console.log("map: " + map.toString());
+    if (!map || typeof map.name === "undefined") {
+        return res.status(400).json({ success: false, errorMessage: 'Poorly Formated Map', })
+    }
+
+    User.findOne({ _id: req.userId }, (err, user) => {
+        if (user._id == req.userId) {
+        console.log("user found: " + JSON.stringify(user));
+        user.maps.push(map._id);
+        user
+            .save()
+            .then(() => {
+                map
+                    .save()
+                    .then(() => {
+                        return res.status(201).json({
+                            map: map
+                        })
+                    })
+                    .catch(error => {
+                        return res.status(400).json({
+                            errorMessage: 'Map Not Created!'
+                        })
+                    })
             });
-        });
-}
-
-getNames = async (req, res) => {
-    console.log("Get all names in db ");
-
-    await Map.find({},'name', (err, maps) => {
-        if (err) {
-            return res.status(400).json({ success: false, error: err })
+        } else {
+           console.log("incorrect user!");
+                    return res.status(400).json({ 
+                        errorMessage: "authentication error" 
+                    }); 
         }
-        if (!maps.length) {
-            return res
-                .status(404)
-                .json({ success: false, error: `Map not found` })
-        }
-        return res.status(200).json({ success: true, data: maps })
-    }).catch(err => console.log(err))
+    })
 }
 
 module.exports = {
-   createNewName,
-    getNames
+   createNewMap,
 }

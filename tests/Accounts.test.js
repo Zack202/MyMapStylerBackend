@@ -1,6 +1,6 @@
 const request = require('supertest');
-const app = require('./index.js');
-const db = require('./databasetemp.js');
+const app = require('../index.js');
+const db = require('../databasetemp.js');
 
 const agent = request.agent(app);
 
@@ -193,9 +193,9 @@ describe('Login Tests', () => {
     expect(response2.body.errorMessage).toBe("Wrong email or password provided.");
     
   });
+});
 
-
-  describe('Logout Tests', () => {
+describe('Logout Tests', () => {
       
       test('should logout for a Get request to /auth/logout READ TEST', async () => {
         
@@ -204,7 +204,7 @@ describe('Login Tests', () => {
         //Check cookie is cleared
         expect(response.headers['set-cookie'][0]).toBe("token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=None");
       });
-  });
+
 
   describe('Get Logged In Tests', () => {
       
@@ -241,3 +241,4 @@ describe('Login Tests', () => {
     });
 });
 });
+
