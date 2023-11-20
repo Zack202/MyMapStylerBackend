@@ -103,7 +103,7 @@ registerUser = async (req, res) => {
         const { userName, firstName, lastName, email, password, confirmPassword } = req.body;
         console.log("create user: " + userName + " " + firstName + " " + lastName + " " + email + " " + password + " " + confirmPassword);
         if (!userName || !firstName || !lastName || !email || !password || !confirmPassword) {
-            console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+
             return res
                 .status(400)
                 .json({ errorMessage: "Please enter all required fields." });
