@@ -106,7 +106,22 @@ updateMap = async (req, res) => {
     })
 }
 
+getMaps = async (req, res) => {
+    await Map.find({}, (err, maps) => {
+        if (err) {
+            return res.status(400).json({ success: false, error: err })
+        }
+        if (!maps.length) {
+            return res
+                .status(404)
+                .json({ success: false, error: `Maps not found` })
+        }
+        return res.status(200).json({ success: true, data: maps })
+    }).catch(err => console.log(err))
+}
+
 module.exports = {
    createNewMap,
    updateMap,
+   getMaps,
 }
