@@ -34,8 +34,9 @@ getLoggedIn = async (req, res) => {
 loginUser = async (req, res) => {
     console.log("loginUser");
     try {
+        console.log("Body", req.body)
         const { email, password } = req.body;
-
+        console.log("Email: ", email, " Password:", password)
         if (!email || !password) {
             return res
                 .status(400)
@@ -102,6 +103,7 @@ registerUser = async (req, res) => {
         const { userName, firstName, lastName, email, password, confirmPassword } = req.body;
         console.log("create user: " + userName + " " + firstName + " " + lastName + " " + email + " " + password + " " + confirmPassword);
         if (!userName || !firstName || !lastName || !email || !password || !confirmPassword) {
+            console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
             return res
                 .status(400)
                 .json({ errorMessage: "Please enter all required fields." });
