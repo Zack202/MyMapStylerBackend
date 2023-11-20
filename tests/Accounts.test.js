@@ -146,7 +146,7 @@ describe('Login Tests', () => {
       email: 'john@gmail.com',
       password: 'password'
     }
-    const response2 = await request(app).get('/auth/login').send(accountToLogin);
+    const response2 = await request(app).post('/auth/login').send(accountToLogin);
     expect(response2.statusCode).toBe(200);
     expect(response2.body.success).toBe(true);
     expect(response2.body.user.email).toBe(accountToLogin.email);
@@ -167,7 +167,7 @@ describe('Login Tests', () => {
     const accountToLogin = {
       email: 'john@gmail.com'
     }
-    const response2 = await request(app).get('/auth/login').send(accountToLogin);
+    const response2 = await request(app).post('/auth/login').send(accountToLogin);
     expect(response2.statusCode).toBe(400);
     expect(response2.body.errorMessage).toBe("Please enter all required fields.");
   });
@@ -188,7 +188,7 @@ describe('Login Tests', () => {
       email: 'john@gmail.com',
       password: 'password123'
     }
-    const response2 = await request(app).get('/auth/login').send(accountToLogin);
+    const response2 = await request(app).post('/auth/login').send(accountToLogin);
     expect(response2.statusCode).toBe(401);
     expect(response2.body.errorMessage).toBe("Wrong email or password provided.");
     
@@ -224,7 +224,7 @@ describe('Logout Tests', () => {
       email: 'john@gmail.com',
       password: 'password'
     }
-    const response2 = await request(app).get('/auth/login').send(accountToLogin);
+    const response2 = await request(app).post('/auth/login').send(accountToLogin);
     expect(response2.statusCode).toBe(200);
 
     const cookies = response2.header['set-cookie'];

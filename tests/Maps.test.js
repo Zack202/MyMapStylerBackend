@@ -33,7 +33,7 @@ describe('Create New Map Tests', () => {
             password: 'password',
           };
         
-          response2 = await request(app).get('/auth/login').send(accountToLogin);
+          response2 = await request(app).post('/auth/login').send(accountToLogin);
           expect(response2.statusCode).toBe(200);
       
     
@@ -76,7 +76,7 @@ describe('Create New Map Tests', () => {
             password: 'password',
           };
         
-          response2 = await request(app).get('/auth/login').send(accountToLogin);
+          response2 = await request(app).post('/auth/login').send(accountToLogin);
           expect(response2.statusCode).toBe(200);
       
     
@@ -104,7 +104,7 @@ describe('Create New Map Tests', () => {
             password: 'password',
           };
         
-          response2 = await request(app).get('/auth/login').send(accountToLogin);
+          response2 = await request(app).post('/auth/login').send(accountToLogin);
           expect(response2.statusCode).toBe(200);
       
     
@@ -143,7 +143,7 @@ describe('Update Map Tests', () => {
             password: 'password',
           };
         
-          response2 = await request(app).get('/auth/login').send(accountToLogin);
+          response2 = await request(app).post('/auth/login').send(accountToLogin);
           expect(response2.statusCode).toBe(200);
       
     
@@ -193,7 +193,7 @@ describe('Update Map Tests', () => {
             password: 'password',
           };
         
-          response2 = await request(app).get('/auth/login').send(accountToLogin);
+          response2 = await request(app).post('/auth/login').send(accountToLogin);
           expect(response2.statusCode).toBe(200);
       
     
