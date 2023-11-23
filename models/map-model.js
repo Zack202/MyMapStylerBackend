@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const ObjectId = Schema.Types.ObjectId
+const { ObjectId } = mongoose.Schema.Types
 
 const MapSchema = new mongoose.Schema(
     {
@@ -12,7 +12,7 @@ const MapSchema = new mongoose.Schema(
         views: {type: Number, required: false},
         date: {type: Date, required: false},
         published: {type: Boolean, required: true},
-        mapGeometry: {type: Object, required: true},
+        mapGeometryFileId: {type: ObjectId, ref: 'MapGeometry', required: true},
         mapFeatures: {type: Object, required: true},
         mapZoom: {type: Number, required: false},
         mapCenter: {type: [Number], required: false},
