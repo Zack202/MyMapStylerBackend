@@ -125,6 +125,15 @@ registerUser = async (req, res) => {
                 })
         }
         console.log("password and password verify match");
+        if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email)) {
+            return res
+                .status(400)
+                .json({
+                    errorMessage: "Please enter a valid email."
+                })
+        }
+        console.log("valid email formatting")
+        
         const existingUser = await User.findOne({ email: email });
         console.log("existingUser: " + existingUser);
         if (existingUser) {
