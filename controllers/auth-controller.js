@@ -278,7 +278,7 @@ resetPassword = async (req, res) => {
     //Need to Hash the password
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
-    user.passwordHash = passwordHash = await bcrypt.hash(password, salt);
+    user.passwordHash = passwordHash = await bcrypt.hash(req.body.password, salt);
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
 
