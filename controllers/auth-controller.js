@@ -127,6 +127,15 @@ registerUser = async (req, res) => {
                 })
         }
         console.log("password and password verify match");
+        if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email)) {
+            return res
+                .status(400)
+                .json({
+                    errorMessage: "Please enter a valid email."
+                })
+        }
+        console.log("valid email formatting")
+        
         const existingUser = await User.findOne({ email: email });
         console.log("existingUser: " + existingUser);
         if (existingUser) {
@@ -186,6 +195,7 @@ registerUser = async (req, res) => {
         res.status(500).send();
     }
 }
+
 
 forgotPassword = async (req, res) => {
     userEmailAddress = req.body.email;
@@ -302,6 +312,38 @@ resetPassword = async (req, res) => {
             }
         })
 
+
+deleteUser = async (req, res) => {
+    try {
+        let userId = auth.verifyUser(req);
+        if (!userId) {
+            return res.status(401).json({
+                loggedIn: false,
+                user: null,
+                errorMessage: "?"
+            })
+        }
+
+        const loggedInUser = await User.findOne({ _id: userId });
+        console.log("loggedInUser: " + loggedInUser);
+
+        await User.findOneAndDelete({ _id: userId });
+        console.log("user deleted");
+
+        res.cookie("token", "", {
+            httpOnly: true,
+            expires: new Date(0),
+            secure: true,
+            sameSite: "none"
+        }).send();
+        return res.status(200).json({
+            success: true,
+        })
+    } catch (err) {
+        console.log("err: " + err);
+        res.json(false);
+    }
+
 }
 
 module.exports = {
@@ -310,5 +352,7 @@ module.exports = {
     loginUser,
     logoutUser,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    deleteUser
+
 }
