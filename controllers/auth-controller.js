@@ -1,6 +1,8 @@
 const auth = require('../auth')
 const User = require('../models/user-model')
 const bcrypt = require('bcryptjs')
+const sendEmail = require('../utils/email')
+const crypto = require('crypto')
 
 getLoggedIn = async (req, res) => {
     try {
@@ -194,6 +196,123 @@ registerUser = async (req, res) => {
     }
 }
 
+
+forgotPassword = async (req, res) => {
+    userEmailAddress = req.body.email;
+    console.log("userEmailAddress: " + userEmailAddress);
+    if (!userEmailAddress) {
+        return res
+            .status(400)
+            .json({ errorMessage: "Please enter all required fields." });
+    }
+    console.log("all fields provided");
+
+    const existingUser = await User.findOne({ email: userEmailAddress });
+    console.log("existingUser: " + existingUser);
+    if (!existingUser) {
+        return res
+            .status(400)
+            .json({
+                success: false,
+                errorMessage: "An account with this email address does not exist."
+            })
+    }
+
+    // SEND EMAIL TO USER WITH PASSWORD RESET LINK
+    let resetToken = existingUser.createResetPasswordToken();
+
+    //Return success and give cookie to allow user to reset password
+
+    await existingUser.save(validatebeforeSave = false);
+    const isLocal = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
+    const baseURL = isLocal ? 'http://localhost:3000' : 'https://my-map-styler-frontend-60bea3c51be3.herokuapp.com';
+    const resetURL = `${baseURL}/resetPassword/${resetToken}`;
+    
+    const messageToSend = `Forgot your password? Submit a request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
+    try {
+        console.log("here1");
+        await sendEmail(
+            email = existingUser.email,
+            subject = 'Your password reset token (valid for 10 minutes)',
+            message = messageToSend
+        );
+        return res.status(200).json({
+            success: true,
+            message: 'Token sent to email!'
+        })
+    } catch (err) {
+        console.log("err: " + err);
+        existingUser.passwordResetToken = undefined;
+        existingUser.passwordResetExpires = undefined;
+        await existingUser.save(validatebeforeSave = false);
+        return res.status(500).json({
+            success: false,
+            errorMessage: "There was an error sending the email. Try again later!"
+        })
+    }
+
+}
+
+resetPassword = async (req, res) => {
+
+    const token = crypto.createHash("sha256").update(req.params.token).digest("hex");
+    const user = await User.findOne({ passwordResetToken: token, passwordResetExpires: { $gt: Date.now() } });
+
+    if (!user) {
+        return res.status(400).json({
+            success: false,
+            errorMessage: "Token is invalid or has expired."
+        })
+    }
+
+    if (!req.body.password || !req.body.passwordConfirm) {
+        return res.status(400).json({
+            success: false,
+            errorMessage: "Please enter all required fields."
+        })
+    }
+
+    if  (req.body.password.length < 8) {
+        return res.status(400).json({
+            success: false,
+            errorMessage: "Please enter a password of at least 8 characters."
+        })
+    }
+
+    if (req.body.password !== req.body.passwordConfirm) {
+        return res.status(400).json({
+            success: false,
+            errorMessage: "Please enter the same password twice."
+        })
+    }
+    //Need to Hash the password
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    user.passwordHash = passwordHash = await bcrypt.hash(req.body.password, salt);
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save();
+
+    // LOGIN THE USER
+        const tokenLogin = auth.signToken(user._id);
+        console.log(tokenLogin);
+
+        res.cookie("token", tokenLogin, {
+            httpOnly: true,
+            secure: true,
+            sameSite: true
+        }).status(200).json({
+            success: true,
+            user: {
+                userName: user.userName,
+                firstName: user.firstName,
+                lastName: user.lastName,  
+                email: user.email             
+            }
+        })
+
+
 deleteUser = async (req, res) => {
     try {
         let userId = auth.verifyUser(req);
@@ -224,6 +343,7 @@ deleteUser = async (req, res) => {
         console.log("err: " + err);
         res.json(false);
     }
+
 }
 
 module.exports = {
@@ -231,5 +351,8 @@ module.exports = {
     registerUser,
     loginUser,
     logoutUser,
+    forgotPassword,
+    resetPassword,
     deleteUser
+
 }
