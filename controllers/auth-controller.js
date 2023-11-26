@@ -194,9 +194,42 @@ registerUser = async (req, res) => {
     }
 }
 
+deleteUser = async (req, res) => {
+    try {
+        let userId = auth.verifyUser(req);
+        if (!userId) {
+            return res.status(401).json({
+                loggedIn: false,
+                user: null,
+                errorMessage: "?"
+            })
+        }
+
+        const loggedInUser = await User.findOne({ _id: userId });
+        console.log("loggedInUser: " + loggedInUser);
+
+        await User.findOneAndDelete({ _id: userId });
+        console.log("user deleted");
+
+        res.cookie("token", "", {
+            httpOnly: true,
+            expires: new Date(0),
+            secure: true,
+            sameSite: "none"
+        }).send();
+        return res.status(200).json({
+            success: true,
+        })
+    } catch (err) {
+        console.log("err: " + err);
+        res.json(false);
+    }
+}
+
 module.exports = {
     getLoggedIn,
     registerUser,
     loginUser,
-    logoutUser
+    logoutUser,
+    deleteUser
 }
