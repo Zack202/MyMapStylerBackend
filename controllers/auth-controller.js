@@ -311,7 +311,7 @@ resetPassword = async (req, res) => {
                 email: user.email             
             }
         })
-
+    }
 
 deleteUser = async (req, res) => {
     try {
@@ -353,6 +353,5 @@ module.exports = {
     logoutUser,
     forgotPassword,
     resetPassword,
-    deleteUser
-
+    deleteUser,
 }

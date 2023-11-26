@@ -3,10 +3,6 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose'); // Import mongoose
-const { GridFSBucket } = require('mongodb');
-const multer = require('multer');
-const { MapController } = require('./controllers/map-controller');
-const mongodb = require('mongodb');
 
 // CREATE OUR SERVER
 dotenv.config();
@@ -55,18 +51,6 @@ db.on('error', (error) => {
 
 db.once('open', () => {
   console.log('Connected to MongoDB Atlas');
-
-  const gfsBucket = new mongodb.GridFSBucket(db.db, {
-    bucketName: 'maps',
-  });
-
-  const upload = multer({
-    dest: 'uploads/',
-  })
-
-  app.post('/upload', upload.single('file'), (req, res) => MapController.uploadMap(req, res, gfsBucket));
-
-  app.get('/download/:filename', (req, res) => MapController.downloadMap(req, res, gfsBucket));
 
   app.get('/', (req,res) => {	
     res.send('Welcome to My Map Styler API!');	
