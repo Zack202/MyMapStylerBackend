@@ -1,122 +1,44 @@
 const { listenerCount } = require('../models/map-model');
 const Map = require('../models/map-model')
 const User = require('../models/user-model');
-const multer = require('multer');
-const mongoose = require('mongoose');
-const Grid = require('gridfs-stream');
-const fs = require('fs');
-const GridFS = require('mongoose').connection.db;
-const unzipper = require('unzipper');
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'uploads/') //change this for dest folder
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.originalname)
-    }
-  });
-  
-  const upload = multer({ storage: storage });
 
 createNewMap = async (req, res) => {
-    const { body, file } = req;
+    const body = req.body;
+    console.log("createMap body: " + JSON.stringify(body));
 
-    if (!body || !file) {
+    if (Object.keys(body).length === 0) {
         return res.status(400).json({
             success: false,
-            errorMessage: 'You must provide a MapFile and Map Information',
+            errorMessage: 'You must provide a Map',
         })
     }
-    const { name, userName, ownerEmail, mapFeatures, mapZoom, mapCenter, mapType } = body;
-  console.log("createMap body: " + JSON.stringify(req.body));
 
-  if (!name || !userName || !ownerEmail || !mapFeatures || !mapZoom || !mapCenter || !mapType) {
-    return res.status(400).json({
-      success: false,
-      errorMessage: 'You must provide all map information',
-    });
-  }
-
-  User.findOne({ _id: req.userId }, async (err, user) => {
-    if (!user || user._id != req.userId) {
-      return res.status(400).json({
-        errorMessage: "Authentication error"
-      });
+    const map = new Map(body);
+    console.log("map: " + map.toString());
+    if (!map || typeof map.name === "undefined") {
+        return res.status(400).json({ success: false, errorMessage: 'Poorly Formated Map', })
     }
 
-    const map = new Map({
-      name,
-      userName,
-      ownerEmail,
-      mapFeatures,
-      mapZoom,
-      mapCenter,
-      mapType
-    });
-
-    const zippedBuffer = file.buffer;
-
-    const extractedJSON = await unzipper.Open.buffer(zippedBuffer)
-    .then((directory) => {
-      const jsonFile = directory.files.find((file) => file.type === 'File' && file.path.endsWith('.json'));
-      return jsonFile.buffer();
-    })
-    .catch((error) => {
-      console.error('Error extracting JSON from ZIP:', error);
-      return null;
-    });
-
-  if (!extractedJSON) {
-    return res.status(500).json({
-      success: false,
-      errorMessage: 'Failed to extract JSON from ZIP',
-    });
-  }
-
-    try {
-      await map.save();
-
-      // Upload only mapGeometry to GridFS
-      const writestream = GridFS.createWriteStream({
-        filename: 'extracted.json',
-        metadata: { mapId: map._id, fileType: 'extractedJSON' },
-      });
-
-      fs.createReadStream(path).pipe(writestream);
-
-      writestream.on('close', async function (file) {
-        console.log('File ' + file.filename + ' uploaded successfully');
-            map.mapGeometryFileId = file._id; // Set the mapGeometryFileId
-            try {
-                await map.save(); // Save the map with new mapGeometryFileId
-                return res.status(201).json({
-                map: map
-                });
-            } catch (error) {
-                console.error('Error updating map with fileId:', error);
-                return res.status(400).json({
-                errorMessage: 'Failed to update map with fileId'
-                });
-            }
-      });
-
-      writestream.on('error', function (error) {
-        console.log('Error uploading file:', error);
-        return res.status(400).json({
-          errorMessage: 'File upload failed'
+    User.findOne({ _id: req.userId }, async (err, user) => {
+        if (user && user._id == req.userId) {
+        console.log("user found: " + JSON.stringify(user));
+        user.maps.push(map._id);
+        await map.save();
+        await user.save();
+        console.log("SUCCESS!!!");
+        return res.status(201).json({
+            success: true,
+            id: map._id,
+            message: 'Map created!',
         });
-      });
-
-    } catch (error) {
-      console.error('Error creating map:', error);
-      return res.status(400).json({
-        errorMessage: 'Map Not Created!'
-      });
-    }
-  });
-
-};
+        } else {
+           console.log("incorrect user!");
+                    return res.status(400).json({ 
+                        errorMessage: "authentication error" 
+                    }); 
+        }
+    })
+}
 
 updateMap = async (req, res) => {
     const body = req.body

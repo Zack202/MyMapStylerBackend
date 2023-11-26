@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const { ObjectId } = mongoose.Schema.Types
+const ObjectId = Schema.Types.ObjectId
 
 const MapSchema = new mongoose.Schema(
     {
@@ -11,9 +11,9 @@ const MapSchema = new mongoose.Schema(
         dislikes: {type:[String], required: false},
         views: {type: Number, required: false},
         date: {type: Date, required: false},
-        published: {type: Boolean, required: true},
-        mapGeometryFileId: {type: ObjectId, ref: 'MapGeometry', required: true},
-        mapFeatures: {type: Object, required: true},
+        published: {type: Boolean, required: false},
+        mapGeometry: {type: Object, required: true},
+        mapFeatures: {type: Object, required: false},
         mapZoom: {type: Number, required: false},
         mapCenter: {type: [Number], required: false},
         previousCreators: { type: [String], required: false},
