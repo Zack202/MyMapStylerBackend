@@ -6,12 +6,19 @@ const jsonDiff = require('json-diff');
 createNewMap = async (req, res) => {
     const body = req.body;
     console.log("createMap body: " + JSON.stringify(body));
-
+    
     if (Object.keys(body).length === 0) {
         return res.status(400).json({
             success: false,
             errorMessage: 'You must provide a Map',
         })
+    }
+    const { name, userName, ownerEmail, mapGeometry, mapType } = req.body;
+    if (!name || !userName || !ownerEmail || !mapGeometry || !mapType) {
+        return res.status(400).json({
+            success: false,
+            error: 'Missing required fields: name, userName, ownerEmail, mapGeometry, mapType'
+        });
     }
 
     const map = new Map(body);
@@ -31,6 +38,7 @@ createNewMap = async (req, res) => {
             success: true,
             id: map._id,
             message: 'Map created!',
+            map: map
         });
         } else {
            console.log("incorrect user!");
@@ -137,6 +145,33 @@ updateMapFeatures = async (req, res) => {
     }
 };
 
+getMapById = async (req, res) => {
+    console.log("find map with id: " + JSON.stringify(req.params.id));
+    await Map.findById({_id: req.params.id}, (err, mapcan) => {
+        if (err) {
+            return res.status(400).json({success: false, error: err});
+        }
+        console.log("Found map: " + JSON.stringify(mapcan));
+
+        //check if belongs to user
+        async function asyncFindUser(mapcan){
+            await User.findOne({email: mapcan.ownerEmail}, (err, user) => {
+                console.log("user._id: " + req.userId);
+                if (user._id == req.userId){
+                    console.log("correct user!");
+                    return res.status(200).json({success: true, map: mapcan})
+                }
+                else {
+                    console.log("incorrect user!");
+                    return res.status(400).json({ success: false, description: "authentication error" });
+                }
+            });
+
+        }
+        asyncFindUser(mapcan);
+    }).catch(err => console.log(err))
+}
+
 getMapPairs = async (req, res) => {
     console.log("getMapPairs");
     await User.findOne({ _id: req.userId }, (err, user) => {
@@ -200,10 +235,10 @@ getMapPairsPublished = async (req, res) => {
     }
 };
 
-removeMap = async (req, res) => {
+deleteMap = async (req, res) => {
     try {
-        console.log("removeMap");
-        
+        console.log("deleteMap");
+        console.log("req.params.id: " + req.params.id);
         // Check if the map exists
         const map = await Map.findOne({ _id: req.params.id });
         if (!map) {
@@ -213,15 +248,16 @@ removeMap = async (req, res) => {
             });
         }
 
-        // Check if the user owns the map
-        if (map.ownerEmail !== req.userId) {
-            return res.status(401).json({
-                success: false,
-                errorMessage: 'You do not have permission to delete this map.',
-            });
-        }
+        // // Check if the user owns the map
+        // if (map.ownerEmail !== req.userId) {
+        //     return res.status(401).json({
+        //         success: false,
+        //         errorMessage: 'You do not have permission to delete this map.',
+        //     });
+        // }
 
         // Find the user by email
+        console.log("Finding user by email: " + map.ownerEmail);
         const existingUser = await User.findOne({ email: map.ownerEmail });
         if (!existingUser) {
             return res.status(404).json({
@@ -252,7 +288,8 @@ module.exports = {
    createNewMap,
    updateMap,
    getMapPairs,
+   getMapById,
    getMapPairsPublished,
-   removeMap,
+   deleteMap,
    updateMapFeatures
 }
