@@ -38,6 +38,7 @@ createNewMap = async (req, res) => {
             success: true,
             id: map._id,
             message: 'Map created!',
+            map: map
         });
         } else {
            console.log("incorrect user!");
