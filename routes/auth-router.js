@@ -9,5 +9,7 @@ router.get('/loggedIn/', AuthController.getLoggedIn)
 router.post('/forgotPassword/', AuthController.forgotPassword)
 router.patch('/resetPassword/:token', AuthController.resetPassword)
 router.get('/deleteUser/', AuthController.deleteUser)
+router.put('/profile', AuthController.updateUserInfo)
+
 
 module.exports = router
