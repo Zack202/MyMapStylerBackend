@@ -9,6 +9,6 @@ router.put('/updateMapFeatures/:id',auth.verify, MapController.updateMapFeatures
 router.get('/mapPairs', auth.verify, MapController.getMapPairs)
 router.get('/map/:id', auth.verify, MapController.getMapById)
 router.get('/mapPairsPublished', auth.verify, MapController.getMapPairsPublished)
-router.get('/removeMap/:id', auth.verify, MapController.removeMap)
+router.get('/deleteMap/:id', auth.verify, MapController.deleteMap)
 
 module.exports = router

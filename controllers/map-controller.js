@@ -235,10 +235,10 @@ getMapPairsPublished = async (req, res) => {
     }
 };
 
-removeMap = async (req, res) => {
+deleteMap = async (req, res) => {
     try {
-        console.log("removeMap");
-        
+        console.log("deleteMap");
+        console.log("req.params.id: " + req.params.id);
         // Check if the map exists
         const map = await Map.findOne({ _id: req.params.id });
         if (!map) {
@@ -248,15 +248,16 @@ removeMap = async (req, res) => {
             });
         }
 
-        // Check if the user owns the map
-        if (map.ownerEmail !== req.userId) {
-            return res.status(401).json({
-                success: false,
-                errorMessage: 'You do not have permission to delete this map.',
-            });
-        }
+        // // Check if the user owns the map
+        // if (map.ownerEmail !== req.userId) {
+        //     return res.status(401).json({
+        //         success: false,
+        //         errorMessage: 'You do not have permission to delete this map.',
+        //     });
+        // }
 
         // Find the user by email
+        console.log("Finding user by email: " + map.ownerEmail);
         const existingUser = await User.findOne({ email: map.ownerEmail });
         if (!existingUser) {
             return res.status(404).json({
@@ -289,6 +290,6 @@ module.exports = {
    getMapPairs,
    getMapById,
    getMapPairsPublished,
-   removeMap,
+   deleteMap,
    updateMapFeatures
 }
