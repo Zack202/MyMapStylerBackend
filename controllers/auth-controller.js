@@ -347,7 +347,7 @@ deleteUser = async (req, res) => {
 
 updateUserInfo = async (req, res) => {
     try{
-        const body = req.body.data;
+        const body = req.body;
         console.log("trying to update profile info")
         console.log(body)
         if (!body) {
@@ -368,7 +368,6 @@ updateUserInfo = async (req, res) => {
 
         const user = await User.findOne({ _id: userId });
         console.log("THE loggedInUser: " + user);
-        console.log(body.firstName)
 
         user.firstName = body.firstName;
         user.lastName = body.lastName;
