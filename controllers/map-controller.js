@@ -1,6 +1,7 @@
 const { listenerCount } = require('../models/map-model');
 const Map = require('../models/map-model')
 const User = require('../models/user-model');
+const jsonDiff = require('json-diff');
 
 createNewMap = async (req, res) => {
     const body = req.body;
@@ -41,62 +42,100 @@ createNewMap = async (req, res) => {
 }
 
 updateMap = async (req, res) => {
-    const body = req.body
-    console.log("updateMap: " + JSON.stringify(body));
-    console.log("req.body.name: " + req.body.name);
-    console.log("req.params.id: " + req.params.id);
+    const diff = req.body;
+    console.log("updateMap diff: " + JSON.stringify(diff));
 
-    if (Object.keys(body).length === 0) {
-        return res.status(400).json({
-            success: false,
-            errorMessage: 'You must provide a Map Update',
-        })
-    }
-
-    Map.findOne({ _id: req.params.id }, (err, map) => {
+    try {
+        const map = await Map.findOne({ _id: req.params.id });
         console.log("map found: " + JSON.stringify(map));
-        if (err) {
+
+        if (!map) {
             return res.status(404).json({
-                err,
                 message: 'Map not found!',
-            })
+                success: false,
+            });
         }
 
-        // DOES THIS LIST BELONG TO THIS USER?
-        async function asyncFindUser(newMap) {
-            try {
-                const user = await User.findOne({ email: newMap.ownerEmail }).exec();
-                if (user && user._id == req.userId) {
-                    console.log("user._id: " + user._id);
-                    console.log("req.userId: " + req.userId);
-        
-                    await newMap.save();
-        
-                    console.log("SUCCESS!!!");
-                    return res.status(200).json({
-                        success: true,
-                        id: newMap._id,
-                        message: 'Map updated!',
-                    });
-                } else {
-                    console.log("User not found!");
-                    return res.status(404).json({
-                        message: 'User not found!',
-                        success: false,
-                    });
-                }
-            } catch (error) {
-                console.log("FAILURE: " + JSON.stringify(error));
-                return res.status(500).json({
-                    error,
-                    message: 'Internal server error!',
-                });
-            }
+        const user = await User.findOne({ email: map.ownerEmail }).exec();
+        if (user && user._id.toString() === req.userId) {
+            console.log("User verified. Proceeding to update the map.");
+
+            //Apply diff
+            const patchedMap = jsonDiff.patch(map.toObject(), diff);
+
+            //Update the map
+            Object.assign(map, patchedMap);
+            await map.save();
+
+            console.log("SUCCESS!!! Map updated.");
+            return res.status(200).json({
+                success: true,
+                id: map._id,
+                message: 'Map updated!',
+            });
+        } else {
+            console.log("User not found or unauthorized.");
+            return res.status(404).json({
+                message: 'User not found or unauthorized!',
+                success: false,
+            });
         }
-        
-        asyncFindUser(map);
-    })
-}
+    } catch (error) {
+        console.log("FAILURE: " + JSON.stringify(error));
+        return res.status(500).json({
+            error,
+            message: 'Internal server error!',
+        });
+    }
+};
+
+updateMapFeatures = async (req, res) => {
+    const { mapId } = req.params;
+    const diff = req.body.diff;
+
+    try {
+        const map = await Map.findOne({ _id: mapId });
+        console.log("Map found: " + JSON.stringify(map));
+
+        if (!map) {
+            return res.status(404).json({
+                message: 'Map not found!',
+                success: false,
+            });
+        }
+
+        const user = await User.findOne({ email: map.ownerEmail }).exec();
+        if (user && user._id.toString() === req.userId) {
+            console.log("User verified. Proceeding to update mapFeatures.");
+
+            //Apply diff
+            const patchedMapFeatures = jsonDiff.patch(map.mapFeatures, diff);
+
+            //Update mapFeatures
+            map.mapFeatures = patchedMapFeatures;
+            await map.save();
+
+            console.log("SUCCESS!!! Map features updated.");
+            return res.status(200).json({
+                success: true,
+                id: map._id,
+                message: 'Map features updated!',
+            });
+        } else {
+            console.log("User not found or unauthorized.");
+            return res.status(404).json({
+                message: 'User not found or unauthorized!',
+                success: false,
+            });
+        }
+    } catch (error) {
+        console.log("FAILURE: " + JSON.stringify(error));
+        return res.status(500).json({
+            error,
+            message: 'Internal server error!',
+        });
+    }
+};
 
 getMapById = async (req, res) => {
     console.log("find map with id: " + JSON.stringify(req.params.id));
@@ -163,9 +202,85 @@ getMapPairs = async (req, res) => {
     }).catch(err => console.log(err))
 }
 
+getMapPairsPublished = async (req, res) => {
+    try {
+        console.log("getMapPairsPublished - Fetching published maps");
+        const publishedMaps = await Map.find({ published: true });
+
+        if (!publishedMaps || publishedMaps.length === 0) {
+            console.log("No published maps found.");
+            return res.status(404).json({ success: false, error: 'Published maps not found' });
+        }
+
+        console.log("Sending the Map pairs.");
+        // Transform published maps to ID, NAME PAIRS
+        const pairs = publishedMaps.map(map => ({
+            _id: map._id,
+            name: map.name
+        }));
+
+        console.log(pairs);
+        return res.status(200).json({ success: true, idNamePairs: pairs });
+    } catch (error) {
+        console.log("Error:", error);
+        return res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+};
+
+removeMap = async (req, res) => {
+    try {
+        console.log("removeMap");
+        
+        // Check if the map exists
+        const map = await Map.findOne({ _id: req.params.id });
+        if (!map) {
+            return res.status(404).json({
+                success: false,
+                errorMessage: 'Map not found.',
+            });
+        }
+
+        // Check if the user owns the map
+        if (map.ownerEmail !== req.userId) {
+            return res.status(401).json({
+                success: false,
+                errorMessage: 'You do not have permission to delete this map.',
+            });
+        }
+
+        // Find the user by email
+        const existingUser = await User.findOne({ email: map.ownerEmail });
+        if (!existingUser) {
+            return res.status(404).json({
+                success: false,
+                errorMessage: 'User not found.',
+            });
+        }
+
+        // Remove the map from the user's maps
+        existingUser.maps = existingUser.maps.filter(mapId => mapId != req.params.id);
+        await existingUser.save();
+
+        // Delete the map
+        const deletedMap = await Map.findOneAndDelete({ _id: req.params.id });
+        
+        if (!deletedMap) {
+            return res.status(404).json({ success: false, errorMessage: 'Map not found' });
+        }
+
+        return res.status(200).json({ success: true, data: deletedMap });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, errorMessage: 'Internal server error' });
+    }
+};
+
 module.exports = {
    createNewMap,
    updateMap,
    getMapPairs,
    getMapById,
+   getMapPairsPublished,
+   removeMap,
+   updateMapFeatures
 }
