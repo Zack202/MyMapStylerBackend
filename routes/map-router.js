@@ -6,5 +6,6 @@ const auth = require('../auth')
 router.post('/createNewMap',auth.verify, MapController.createNewMap)
 router.put('/updateMap/:id',auth.verify, MapController.updateMap)
 router.get('/mapPairs', auth.verify, MapController.getMapPairs)
+router.get('/map/:id', auth.verify, MapController.getMapById)
 
 module.exports = router
