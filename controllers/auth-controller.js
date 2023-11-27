@@ -347,7 +347,7 @@ deleteUser = async (req, res) => {
 
 updateUserInfo = async (req, res) => {
     try{
-        const body = req.body;
+        const body = req.body.data;
         console.log("trying to update profile info")
         if (!body) {
             return res.status(400).json({
@@ -369,17 +369,26 @@ updateUserInfo = async (req, res) => {
         console.log("THE loggedInUser: " + user);
 
 
-        user.firstName = body.firstName;
-        user.firstName = body.lastName;
+        user.firstName = body.get('firstName');
+        user.firstName = body.get('lastName');
 
         await user.save();
 
         return res.status(200).json({
             success: true,
+            user: {
+                userName: user.userName,
+                firstName: user.firstName,
+                lastName: user.lastName,  
+                email: user.email             
+            },
             message: 'Profile was updated'
         })
     } catch (err){
-        res.json(false);
+        res.status(400).json(false, {
+            message: "couldnt update info"
+        });
+
     }
 }
 
