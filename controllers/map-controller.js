@@ -137,6 +137,33 @@ updateMapFeatures = async (req, res) => {
     }
 };
 
+getMapById = async (req, res) => {
+    console.log("find map with id: " + JSON.stringify(req.params.id));
+    await Map.findById({_id: req.params.id}, (err, mapcan) => {
+        if (err) {
+            return res.status(400).json({success: false, error: err});
+        }
+        console.log("Found map: " + JSON.stringify(mapcan));
+
+        //check if belongs to user
+        async function asyncFindUser(mapcan){
+            await User.findOne({email: mapcan.ownerEmail}, (err, user) => {
+                console.log("user._id: " + req.userId);
+                if (user._id == req.userId){
+                    console.log("correct user!");
+                    return res.status(200).json({success: true, map: mapcan})
+                }
+                else {
+                    console.log("incorrect user!");
+                    return res.status(400).json({ success: false, description: "authentication error" });
+                }
+            });
+
+        }
+        asyncFindUser(mapcan);
+    }).catch(err => console.log(err))
+}
+
 getMapPairs = async (req, res) => {
     console.log("getMapPairs");
     await User.findOne({ _id: req.userId }, (err, user) => {
@@ -252,6 +279,7 @@ module.exports = {
    createNewMap,
    updateMap,
    getMapPairs,
+   getMapById,
    getMapPairsPublished,
    removeMap,
    updateMapFeatures
