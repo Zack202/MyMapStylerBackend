@@ -1,7 +1,7 @@
 const { listenerCount } = require('../models/map-model');
 const Map = require('../models/map-model')
 const User = require('../models/user-model');
-const jsondiffpatch = require('jsondiffpatch').create();
+const jsonDiff = require('json-diff');
 
 createNewMap = async (req, res) => {
     const body = req.body;
@@ -55,7 +55,7 @@ updateMap = async (req, res) => {
 
     try {
         const map = await Map.findOne({ _id: req.params.id });
-        console.log("map found: " );
+        console.log("map found: " + JSON.stringify(map));
 
         if (!map) {
             return res.status(404).json({
@@ -68,9 +68,13 @@ updateMap = async (req, res) => {
         if (user && user._id.toString() === req.userId) {
             console.log("User verified. Proceeding to update the map.");
 
-            // Apply diff to map
-            jsondiffpatch.patch(map, diff);
-
+            //Apply diff
+            for (const key in diff) {
+                if (Object.prototype.hasOwnProperty.call(diff, key)) {
+                    // Extract and apply the new values from the diff to the map object
+                    map[key] = diff[key].__new;
+                }
+            }
             await map.save();
 
             console.log("SUCCESS!!! Map updated.");
