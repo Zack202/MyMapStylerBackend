@@ -346,9 +346,9 @@ deleteUser = async (req, res) => {
 }
 
 updateUserInfo = async (req, res) => {
+    console.log("trying to update profile info")
     try{
-        const body = req.body.data;
-        console.log("trying to update profile info")
+        const body = req.body;
         if (!body) {
             return res.status(400).json({
                 success: false,
@@ -357,6 +357,7 @@ updateUserInfo = async (req, res) => {
         }
 
         let userId = auth.verifyUser(req);
+        
         if (!userId) {
             return res.status(401).json({
                 loggedIn: false,
@@ -367,13 +368,13 @@ updateUserInfo = async (req, res) => {
 
         const user = await User.findOne({ _id: userId });
         console.log("THE loggedInUser: " + user);
+        
+        user.firstName = body.firstName;
+        user.lastName = body.lastName;
 
-
-        user.firstName = body.get('firstName');
-        user.firstName = body.get('lastName');
 
         await user.save();
-
+        
         return res.status(200).json({
             success: true,
             user: {
@@ -385,9 +386,8 @@ updateUserInfo = async (req, res) => {
             message: 'Profile was updated'
         })
     } catch (err){
-        const user = await User.findOne({ _id: userId });
-
-        res.status(400).json(false, { 
+        res.status(400).json({
+            success: false, 
             message: "couldnt update info"
         });
 
