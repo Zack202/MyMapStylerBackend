@@ -345,6 +345,44 @@ deleteUser = async (req, res) => {
 
 }
 
+updateUserInfo = async (req, res) => {
+    try{
+        const body = req.body;
+        console.log("trying to update profile info")
+        if (!body) {
+            return res.status(400).json({
+                success: false,
+                error: 'You must provide a body to update',
+            })
+        }
+
+        let userId = auth.verifyUser(req);
+        if (!userId) {
+            return res.status(401).json({
+                loggedIn: false,
+                user: null,
+                errorMessage: "?"
+            })
+        }
+
+        const user = await User.findOne({ _id: userId });
+        console.log("THE loggedInUser: " + user);
+
+
+        user.firstName = body.firstName;
+        user.firstName = body.lastName;
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Profile was updated'
+        })
+    } catch (err){
+        res.json(false);
+    }
+}
+
 module.exports = {
     getLoggedIn,
     registerUser,
@@ -353,4 +391,5 @@ module.exports = {
     forgotPassword,
     resetPassword,
     deleteUser,
+    updateUserInfo,
 }
