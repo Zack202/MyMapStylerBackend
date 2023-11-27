@@ -335,8 +335,7 @@ deleteUser = async (req, res) => {
             expires: new Date(0),
             secure: true,
             sameSite: "none"
-        }).send();
-        return res.status(200).json({
+        }).status(200).json({
             success: true,
         })
     } catch (err) {
