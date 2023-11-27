@@ -377,6 +377,12 @@ updateUserInfo = async (req, res) => {
         //returns success even though there was an error need to fix
         return res.status(200).json({
             success: true,
+            user: {
+                userName: user.userName,
+                firstName: user.firstName,
+                lastName: user.lastName,  
+                email: user.email             
+            },
             message: 'Profile was updated'
         })
     } catch (err){
