@@ -349,7 +349,6 @@ updateUserInfo = async (req, res) => {
     try{
         const body = req.body;
         console.log("trying to update profile info")
-        console.log(body)
         if (!body) {
             return res.status(400).json({
                 success: false,
@@ -373,7 +372,7 @@ updateUserInfo = async (req, res) => {
         user.lastName = body.lastName;
 
         await user.save();
-        //returns success even though there was an error need to fix
+
         return res.status(200).json({
             success: true,
             user: {
@@ -386,8 +385,8 @@ updateUserInfo = async (req, res) => {
         })
     } catch (err){
         console.log(err)
-        res.status(400).json({
-            success: "false",
+        res.status(402).json({
+            success: false,
             message: "couldnt update account info"
         });
     }
