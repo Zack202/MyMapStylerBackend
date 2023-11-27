@@ -6,12 +6,19 @@ const jsonDiff = require('json-diff');
 createNewMap = async (req, res) => {
     const body = req.body;
     console.log("createMap body: " + JSON.stringify(body));
-
+    
     if (Object.keys(body).length === 0) {
         return res.status(400).json({
             success: false,
             errorMessage: 'You must provide a Map',
         })
+    }
+    const { name, userName, ownerEmail, mapGeometry, mapType } = req.body;
+    if (!name || !userName || !ownerEmail || !mapGeometry || !mapType) {
+        return res.status(400).json({
+            success: false,
+            error: 'Missing required fields: name, userName, ownerEmail, mapGeometry, mapType'
+        });
     }
 
     const map = new Map(body);
