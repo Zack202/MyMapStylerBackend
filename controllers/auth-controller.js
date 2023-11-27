@@ -385,7 +385,9 @@ updateUserInfo = async (req, res) => {
             message: 'Profile was updated'
         })
     } catch (err){
-        res.status(400).json(false, {
+        const user = await User.findOne({ _id: userId });
+
+        res.status(400).json(false, { 
             message: "couldnt update info"
         });
 
