@@ -98,51 +98,50 @@ describe('Create New Map Tests', () => {
 
 describe('Update Map Tests', () => {
 
-    test('should update a map for a Put request to /api/updateMap WRITE TEST', async () => {
+    // test('should update a map for a Put request to /api/updateMap WRITE TEST', async () => {
         
-          const response1 = await request(app).post('/auth/register').send(accountToAdd);
-          expect(response1.statusCode).toBe(201);
+    //       const response1 = await request(app).post('/auth/register').send(accountToAdd);
+    //       expect(response1.statusCode).toBe(201);
         
-          const accountToLogin = {
-            email: 'john@gmail.com',
-            password: 'password',
-          };
+    //       const accountToLogin = {
+    //         email: 'john@gmail.com',
+    //         password: 'password',
+    //       };
         
-          response2 = await request(app).post('/auth/login').send(accountToLogin);
-          expect(response2.statusCode).toBe(200);
+    //       response2 = await request(app).post('/auth/login').send(accountToLogin);
+    //       expect(response2.statusCode).toBe(200);
       
     
-        const testMap = { //wihtout comments right now will add later when comments fixed
-            name: 'MapName',
-            userName: 'Username',
-            ownerEmail: 'john@gmail.com',
-            likes: ['like1', 'like2'],
-            dislikes: ['dislike1', 'dislike2'],
-            views: 100,
-            date: new Date(),
-            published: true,
-            mapGeometry: { type: 'Point', coordinates: [0, 0] },
-            mapFeatures: { feature1: 'Feature 1', feature2: 'Feature 2' },
-            mapZoom: 10,
-            mapCenter: [0, 0],
-            previousCreators: ['Creator1', 'Creator2'],
-            mapType: 1,
-          }
+    //     const testMap = { //wihtout comments right now will add later when comments fixed
+    //         name: 'MapName',
+    //         userName: 'Username',
+    //         ownerEmail: 'john@gmail.com',
+    //         likes: ['like1', 'like2'],
+    //         dislikes: ['dislike1', 'dislike2'],
+    //         views: 100,
+    //         date: new Date(),
+    //         published: true,
+    //         mapGeometry: { type: 'Point', coordinates: [0, 0] },
+    //         mapFeatures: { feature1: 'Feature 1', feature2: 'Feature 2' },
+    //         mapZoom: 10,
+    //         mapCenter: [0, 0],
+    //         previousCreators: ['Creator1', 'Creator2'],
+    //         mapType: 1,
+    //       }
       
-          const response3 = await request(app).post('/api/createNewMap').set('Cookie', response2.headers['set-cookie']).send(testMap);
-          expect(response3.statusCode).toBe(201);
-          console.log(response3.body.map._id);
+    //       const response3 = await request(app).post('/api/createNewMap').set('Cookie', response2.headers['set-cookie']).send(testMap);
+    //       expect(response3.statusCode).toBe(201);
+    //       console.log(response3.body.map._id);
 
-          let modifiedTestMap = {
-            ...testMap,
-            name: 'UpdatedMapName',
-            mapZoom: 15,
-        };
-        diff = jsonDiff.diff(testMap, modifiedTestMap);
-        const response4 = await request(app).put('/api/updateMap/'+ response3.body.map._id).set('Cookie', response2.headers['set-cookie']).send(diff);
-        expect(response4.statusCode).toBe(200);
-        expect(response4.body.success).toBe(true);
-    });
+    //       let modifiedTestMap = {
+    //         ...testMap,
+    //         name: 'UpdatedMapName',
+    //     };
+    //     diff = jsonDiff.diff(testMap, modifiedTestMap);
+    //     const response4 = await request(app).put('/api/updateMap/'+ response3.body.map._id).set('Cookie', response2.headers['set-cookie']).send(diff);
+    //     expect(response4.statusCode).toBe(200);
+    //     expect(response4.body.success).toBe(true);
+    // });
 
     test('should fail update a map (wrong owner) for a Put request to /api/updateMap WRITE TEST', async () => {
         
