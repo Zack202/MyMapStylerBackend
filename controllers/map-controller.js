@@ -55,7 +55,7 @@ updateMap = async (req, res) => {
 
     try {
         const map = await Map.findOne({ _id: req.params.id });
-        console.log("map found: " + JSON.stringify(map));
+        console.log("map found: ");
 
         if (!map) {
             return res.status(404).json({
@@ -68,14 +68,13 @@ updateMap = async (req, res) => {
         if (user && user._id.toString() === req.userId) {
             console.log("User verified. Proceeding to update the map.");
 
-            //Apply diff
-            for (const key in diff) {
-                if (Object.prototype.hasOwnProperty.call(diff, key)) {
-                    // Extract and apply the new values from the diff to the map object
-                    map[key] = diff[key].__new;
-                }
-            }
-            await map.save();
+                        // Create the update object based on the diff
+                        const nameChanges = diff.diff.name;
+
+                        // Update the 'name' field in the map object
+                        map.name = nameChanges[nameChanges.length - 1]; // Assuming the last value in the array is the updated value
+            
+                        await map.save();
 
             console.log("SUCCESS!!! Map updated.");
             return res.status(200).json({
