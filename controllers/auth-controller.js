@@ -72,8 +72,7 @@ loginUser = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: false,
-            sameSite: true
+            sameSite: 'None', secure: true
         }).status(200).json({
             success: true,
             user: {
@@ -94,8 +93,7 @@ logoutUser = async (req, res) => {
     res.cookie("token", "", {
         httpOnly: true,
         expires: new Date(0),
-        secure: false,
-        sameSite: "none"
+        sameSite: 'None', secure: true
     }).send();
 }
 
@@ -175,8 +173,7 @@ registerUser = async (req, res) => {
 
         await res.cookie("token", token, {
             httpOnly: true,
-            secure: false,
-            sameSite: "none"
+            sameSite: 'None', secure: true
         }).status(201).json({
             success: true,
             user: {
@@ -300,8 +297,7 @@ resetPassword = async (req, res) => {
 
         res.cookie("token", tokenLogin, {
             httpOnly: true,
-            secure: false,
-            sameSite: true
+            sameSite: 'None', secure: true
         }).status(200).json({
             success: true,
             user: {
@@ -333,8 +329,7 @@ deleteUser = async (req, res) => {
         res.cookie("token", "", {
             httpOnly: true,
             expires: new Date(0),
-            secure: false,
-            sameSite: "none"
+            sameSite: 'None', secure: true
         }).status(200).json({
             success: true,
         })
