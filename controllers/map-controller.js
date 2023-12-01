@@ -49,8 +49,24 @@ createNewMap = async (req, res) => {
     })
 }
 
+function createPatch(diff) {
+    const fieldToUpdate = Object.keys(diff)[0];
+    const nameChanges = diff[fieldToUpdate];
+
+    const previousValue = nameChanges[0]; 
+    const updatedValue = nameChanges[nameChanges.length - 1]; 
+
+    const patch = {
+        $set: {
+            [fieldToUpdate]: updatedValue
+        }
+    };
+
+    return patch;
+}
+
 updateMap = async (req, res) => {
-    const diff = req.body;
+    const diff = req.body.diff;
     console.log("updateMap diff: " + JSON.stringify(diff));
 
     try {
@@ -68,20 +84,32 @@ updateMap = async (req, res) => {
         if (user && user._id.toString() === req.userId) {
             console.log("User verified. Proceeding to update the map.");
 
-                        // Create the update object based on the diff
-                        const nameChanges = diff.diff.name;
+            const patch = createPatch(diff);
 
-                        // Update the 'name' field in the map object
-                        map.name = nameChanges[nameChanges.length - 1]; // Assuming the last value in the array is the updated value
+            try {
+                const result = await Map.updateOne({ _id: map._id }, patch);
             
-                        await map.save();
-
-            console.log("SUCCESS!!! Map updated.");
-            return res.status(200).json({
-                success: true,
-                id: map._id,
-                message: 'Map updated!',
-            });
+                if (result.nModified === 0) {
+                    // Document not found or no changes were made
+                    return res.status(404).json({
+                        message: 'Map not found or no changes applied!',
+                        success: false,
+                    });
+                }
+            
+                console.log("SUCCESS!!! Map updated.");
+                return res.status(200).json({
+                    success: true,
+                    id: map._id,
+                    message: 'Map updated!',
+                });
+            } catch (error) {
+                console.log("FAILURE: " + JSON.stringify(error));
+                return res.status(500).json({
+                    error,
+                    message: 'Internal server error!',
+                });
+            }
         } else {
             console.log("User not found or unauthorized.");
             return res.status(404).json({
