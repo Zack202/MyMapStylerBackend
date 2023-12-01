@@ -5,6 +5,7 @@ on:
     branches:
       - DeployedBranch
       - main
+      - DeployedBranch2
 
 jobs:
   deploy:

@@ -55,7 +55,7 @@ updateMap = async (req, res) => {
 
     try {
         const map = await Map.findOne({ _id: req.params.id });
-        console.log("map found: " + JSON.stringify(map));
+        console.log("map found: ");
 
         if (!map) {
             return res.status(404).json({
@@ -68,12 +68,13 @@ updateMap = async (req, res) => {
         if (user && user._id.toString() === req.userId) {
             console.log("User verified. Proceeding to update the map.");
 
-            //Apply diff
-            const patchedMap = jsonDiff.patch(map.toObject(), diff);
+                        // Create the update object based on the diff
+                        const nameChanges = diff.diff.name;
 
-            //Update the map
-            Object.assign(map, patchedMap);
-            await map.save();
+                        // Update the 'name' field in the map object
+                        map.name = nameChanges[nameChanges.length - 1]; // Assuming the last value in the array is the updated value
+            
+                        await map.save();
 
             console.log("SUCCESS!!! Map updated.");
             return res.status(200).json({
@@ -152,23 +153,7 @@ getMapById = async (req, res) => {
             return res.status(400).json({success: false, error: err});
         }
         console.log("Found map: " + JSON.stringify(mapcan));
-
-        //check if belongs to user
-        async function asyncFindUser(mapcan){
-            await User.findOne({email: mapcan.ownerEmail}, (err, user) => {
-                console.log("user._id: " + req.userId);
-                if (user._id == req.userId){
-                    console.log("correct user!");
-                    return res.status(200).json({success: true, map: mapcan})
-                }
-                else {
-                    console.log("incorrect user!");
-                    return res.status(400).json({ success: false, description: "authentication error" });
-                }
-            });
-
-        }
-        asyncFindUser(mapcan);
+        return res.status(200).json({success: true, map: mapcan});
     }).catch(err => console.log(err))
 }
 
@@ -214,11 +199,6 @@ getMapPairsPublished = async (req, res) => {
     try {
         console.log("getMapPairsPublished - Fetching published maps");
         const publishedMaps = await Map.find({ published: true });
-
-        if (!publishedMaps || publishedMaps.length === 0) {
-            console.log("No published maps found.");
-            return res.status(404).json({ success: false, error: 'Published maps not found' });
-        }
 
         console.log("Sending the Map pairs.");
         // Transform published maps to ID, NAME PAIRS
