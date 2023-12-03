@@ -152,7 +152,7 @@ getMapById = async (req, res) => {
         if (err) {
             return res.status(400).json({success: false, error: err});
         }
-        console.log("Found map: " + JSON.stringify(mapcan));
+        console.log("Found map: " + JSON.stringify(mapcan.name));
         return res.status(200).json({success: true, map: mapcan});
     }).catch(err => console.log(err))
 }
