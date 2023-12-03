@@ -21,6 +21,11 @@ createNewMap = async (req, res) => {
         });
     }
 
+    body.mapFeatures = {
+        "ADV" : [],
+        "DP" : [],
+    }
+
     const map = new Map(body);
     console.log("map: " + map.toString());
     if (!map || typeof map.name === "undefined") {
@@ -127,12 +132,18 @@ updateMap = async (req, res) => {
 };
 
 updateMapFeatures = async (req, res) => {
-    const { mapId } = req.params;
-    const diff = req.body.diff;
+    let features = req.body.features;
+    console.log("updateMapFeatures features: " + features);
+    let selectedOption = req.body.selectedOption;
+    console.log("updateMapFeatures selectedOption: " + selectedOption);
+    features = JSON.parse(features);
+    console.log("updateMapFeatures features: " + features);
+
 
     try {
-        const map = await Map.findOne({ _id: mapId });
-        console.log("Map found: " + JSON.stringify(map));
+        const map = await Map.findOne({_id: req.params.id });
+        console.log("Map found");
+        console.log("features: "+ features);
 
         if (!map) {
             return res.status(404).json({
@@ -145,11 +156,15 @@ updateMapFeatures = async (req, res) => {
         if (user && user._id.toString() === req.userId) {
             console.log("User verified. Proceeding to update mapFeatures.");
 
-            //Apply diff
-            const patchedMapFeatures = jsonDiff.patch(map.mapFeatures, diff);
-
-            //Update mapFeatures
-            map.mapFeatures = patchedMapFeatures;
+            if (selectedOption === "Additional Region Data") {
+                console.log("ADV");
+                features.DP = map.mapFeatures.DP;
+                map.mapFeatures = features;
+            }else {
+                console.log("DP");
+                features.ADV = map.mapFeatures.ADV;
+                map.mapFeatures = features;
+            }
             await map.save();
 
             console.log("SUCCESS!!! Map features updated.");

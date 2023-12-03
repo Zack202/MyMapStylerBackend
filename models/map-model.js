@@ -13,7 +13,7 @@ const MapSchema = new mongoose.Schema(
         date: {type: Date, required: false},
         published: {type: Boolean, required: false},
         mapGeometry: {type: Object, required: true},
-        mapFeatures: {type: Object, required: false},
+        mapFeatures: {type: Object, required: true},
         mapZoom: {type: Number, required: false},
         mapCenter: {type: [Number], required: false},
         previousCreators: { type: [String], required: false},
