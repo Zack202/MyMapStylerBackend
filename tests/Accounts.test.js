@@ -329,4 +329,3 @@ describe('ForgotPassword Tests', () => {
     });
   });
 
->>>>>>>>> Temporary merge branch 2
