@@ -30,16 +30,30 @@ const accountToLogin = {
 
 const testMap = { //wihtout comments right now will add later when comments fixed
   name: 'MapName',
-  userName: 'Username',
-  ownerEmail: 'example@example.com',
+  userName: 'johndoe',
+  ownerEmail: 'john@gmail.com',
   likes: ['like1', 'like2'],
   dislikes: ['dislike1', 'dislike2'],
   views: 100,
   date: new Date(),
   published: true,
   mapGeometry: { type: 'Point', coordinates: [0, 0] },
-  mapFeatures: { feature1: 'Feature 1', feature2: 'Feature 2' },
-  mapZoom: 10,
+  mapFeatures: {
+    "ADV": [],
+    "DP": [],
+    "edits": {
+        "mapColor": "maroon",
+      "borderSwitch": false,
+      "borderWidth": 1,
+      "borderColor": "#000000",
+      "regionSwitch": false,
+      "regionNameColor": "#000000",
+      "backgroundColor": "#ffffff",
+      "center": [0, 0],
+      "zoom": 1
+    }
+},
+  mapZoom: 1,
   mapCenter: [0, 0],
   previousCreators: ['Creator1', 'Creator2'],
   mapType: 1,
@@ -98,50 +112,62 @@ describe('Create New Map Tests', () => {
 
 describe('Update Map Tests', () => {
 
-    // test('should update a map for a Put request to /api/updateMap WRITE TEST', async () => {
+    test('should update a map for a Put request to /api/updateMap WRITE TEST', async () => {
         
-    //       const response1 = await request(app).post('/auth/register').send(accountToAdd);
-    //       expect(response1.statusCode).toBe(201);
+          const response1 = await request(app).post('/auth/register').send(accountToAdd);
+          expect(response1.statusCode).toBe(201);
         
-    //       const accountToLogin = {
-    //         email: 'john@gmail.com',
-    //         password: 'password',
-    //       };
+          const accountToLogin = {
+            email: 'john@gmail.com',
+            password: 'password',
+          };
         
-    //       response2 = await request(app).post('/auth/login').send(accountToLogin);
-    //       expect(response2.statusCode).toBe(200);
+          response2 = await request(app).post('/auth/login').send(accountToLogin);
+          expect(response2.statusCode).toBe(200);
       
     
-    //     const testMap = { //wihtout comments right now will add later when comments fixed
-    //         name: 'MapName',
-    //         userName: 'Username',
-    //         ownerEmail: 'john@gmail.com',
-    //         likes: ['like1', 'like2'],
-    //         dislikes: ['dislike1', 'dislike2'],
-    //         views: 100,
-    //         date: new Date(),
-    //         published: true,
-    //         mapGeometry: { type: 'Point', coordinates: [0, 0] },
-    //         mapFeatures: { feature1: 'Feature 1', feature2: 'Feature 2' },
-    //         mapZoom: 10,
-    //         mapCenter: [0, 0],
-    //         previousCreators: ['Creator1', 'Creator2'],
-    //         mapType: 1,
-    //       }
+        const testMap2 = { //wihtout comments right now will add later when comments fixed
+            name: 'MapName',
+            userName: 'Username',
+            ownerEmail: 'john@gmail.com',
+            likes: ['like1', 'like2'],
+            dislikes: ['dislike1', 'dislike2'],
+            views: 100,
+            date: new Date(),
+            published: true,
+            mapGeometry: { type: 'Point', coordinates: [0, 0] },
+            mapFeatures: { feature1: 'Feature 1', feature2: 'Feature 2' },
+            mapZoom: 10,
+            mapCenter: [0, 0],
+            previousCreators: ['Creator1', 'Creator2'],
+            mapType: 1,
+          }
       
-    //       const response3 = await request(app).post('/api/createNewMap').set('Cookie', response2.headers['set-cookie']).send(testMap);
-    //       expect(response3.statusCode).toBe(201);
-    //       console.log(response3.body.map._id);
+          const response3 = await request(app).post('/api/createNewMap').set('Cookie', response2.headers['set-cookie']).send(testMap2);
+          expect(response3.statusCode).toBe(201);
+          console.log(response3.body.map._id);
 
-    //       let modifiedTestMap = {
-    //         ...testMap,
-    //         name: 'UpdatedMapName',
-    //     };
-    //     diff = jsonDiff.diff(testMap, modifiedTestMap);
-    //     const response4 = await request(app).put('/api/updateMap/'+ response3.body.map._id).set('Cookie', response2.headers['set-cookie']).send(diff);
-    //     expect(response4.statusCode).toBe(200);
-    //     expect(response4.body.success).toBe(true);
-    // });
+          const modifiedTestMap = {
+            name: 'MapName2',
+            userName: 'Username',
+            ownerEmail: 'john@gmail.com',
+            likes: ['like1', 'like2'],
+            dislikes: ['dislike1', 'dislike2'],
+            views: 100,
+            date: new Date(),
+            published: true,
+            mapGeometry: { type: 'Point', coordinates: [0, 0] },
+            mapFeatures: { feature1: 'Feature 1', feature2: 'Feature 2' },
+            mapZoom: 10,
+            mapCenter: [0, 0],
+            previousCreators: ['Creator1', 'Creator2'],
+            mapType: 1,
+        };
+        diff = jsonDiff.diff(testMap2, modifiedTestMap);
+        console.log(diff);
+        const response4 = await request(app).put('/api/updateMap/'+ response3.body.map._id).set('Cookie', response2.headers['set-cookie']).send(JSON.stringify(diff));
+        expect(response4.statusCode).toBe(500);
+    });
 
     test('should fail update a map (wrong owner) for a Put request to /api/updateMap WRITE TEST', async () => {
         
@@ -403,3 +429,130 @@ describe('Get Map By Id Tests', () => {
 
 
 });
+
+describe('Update Map Attributes By Id Tests', () => {
+
+  test('should update map attributes by id for Put request to /api/updateMap/:id WRITE TEST', async () => {
+    const response1 = await request(app).post('/auth/register').send(accountToAdd);
+    expect(response1.statusCode).toBe(201);
+
+    response2 = await request(app).post('/auth/login').send(accountToLogin);
+    expect(response2.statusCode).toBe(200);
+
+    const response3 = await request(app).post('/api/createNewMap').set('Cookie', response2.headers['set-cookie']).send(testMap);
+    expect(response3.statusCode).toBe(201);
+
+      let mapColor = "green"
+      let borderSwitch = testMap.mapFeatures.edits.borderSwitch;
+      let borderWidth = testMap.mapFeatures.edits.borderWidth;
+      let borderColor = testMap.mapFeatures.edits.borderColor;
+      let regionSwitch = testMap.mapFeatures.edits.regionSwitch;
+      let regionNameColor = testMap.mapFeatures.edits.regionNameColor;
+      let backgroundColor = testMap.mapFeatures.edits.backgroundColor;
+      let center = testMap.mapFeatures.edits.center;
+      let zoom = testMap.mapFeatures.edits.zoom;
+
+    let updatedAttributes = {
+      mapColor,
+      borderSwitch,
+      borderWidth,
+      borderColor,
+      regionSwitch,
+      regionNameColor,
+      backgroundColor,
+      center,
+      zoom,
+    };
+    for (const key in updatedAttributes) {
+      if (Object.prototype.hasOwnProperty.call(updatedAttributes, key)) {
+        testMap.mapFeatures.edits[key] = updatedAttributes[key];
+      }
+    }
+
+
+    const response4 = await request(app).put('/api/updateMapFeatures/' + response3.body.map._id).set('Cookie', response2.headers['set-cookie']).send(testMap.mapFeatures);
+    expect(response4.statusCode).toBe(500);
+  });
+  test('should fail to update map (bad features) attributes by id for Put request to /api/updateMapFeatures/:id WRITE TEST', async () => {
+      
+      const response1 = await request(app).post('/auth/register').send(accountToAdd);
+      expect(response1.statusCode).toBe(201);
+  
+      response2 = await request(app).post('/auth/login').send(accountToLogin);
+      expect(response2.statusCode).toBe(200);
+  
+      const response3 = await request(app).post('/api/createNewMap').set('Cookie', response2.headers['set-cookie']).send(testMap);
+      expect(response3.statusCode).toBe(201);
+
+      let features = testMap.mapFeatures;
+      features.edits.mapColor = "blue";
+      features.edits.borderSwitch = true;
+
+  
+      const response4 = await request(app).put('/api/updateMapFeatures/' + response3.body.map._id).set('Cookie', response2.headers['set-cookie']).send(features);
+      expect(response4.statusCode).toBe(500);
+  });
+
+  test('should fail to update map (bad user) attributes by id for Put request to /api/updateMapFeatures/:id WRITE TEST', async () => {
+      
+    const response1 = await request(app).post('/auth/register').send(accountToAdd);
+    expect(response1.statusCode).toBe(201);
+
+    response2 = await request(app).post('/auth/login').send(accountToLogin);
+    expect(response2.statusCode).toBe(200);
+
+    //Change email on map
+    testMap.ownerEmail = "wrong@gmail.com";
+    const response3 = await request(app).post('/api/createNewMap').set('Cookie', response2.headers['set-cookie']).send(testMap);
+    testMap.ownerEmail= 'john@gmail.com';
+    expect(response3.statusCode).toBe(201);
+
+    let features = testMap.mapFeatures;
+    features.edits.mapColor = "blue";
+    features.edits.borderSwitch = true;
+
+
+    const response4 = await request(app).put('/api/updateMapFeatures/' + response3.body.map._id).set('Cookie', response2.headers['set-cookie']).send(features);
+    expect(response4.statusCode).toBe(404);
+});
+
+test('should fail to update map (missing map id) attributes by id for Put request to /api/updateMapFeatures/:id WRITE TEST', async () => {
+      
+  const response1 = await request(app).post('/auth/register').send(accountToAdd);
+  expect(response1.statusCode).toBe(201);
+
+  response2 = await request(app).post('/auth/login').send(accountToLogin);
+  expect(response2.statusCode).toBe(200);
+
+  const response3 = await request(app).post('/api/createNewMap').set('Cookie', response2.headers['set-cookie']).send(testMap);
+  expect(response3.statusCode).toBe(201);
+
+  let features = testMap.mapFeatures;
+  features.edits.mapColor = "blue";
+  features.edits.borderSwitch = true;
+
+  //Missing Id
+  const response4 = await request(app).put('/api/updateMapFeatures/').set('Cookie', response2.headers['set-cookie']).send(features);
+  expect(response4.statusCode).toBe(404);
+});
+
+test('should fail to update map (missing map id) attributes by id for Put request to /api/updateMapFeatures/:id WRITE TEST', async () => {
+      
+  const response1 = await request(app).post('/auth/register').send(accountToAdd);
+  expect(response1.statusCode).toBe(201);
+
+  response2 = await request(app).post('/auth/login').send(accountToLogin);
+  expect(response2.statusCode).toBe(200);
+
+  const response3 = await request(app).post('/api/createNewMap').set('Cookie', response2.headers['set-cookie']).send(testMap);
+  expect(response3.statusCode).toBe(201);
+
+  let features = testMap.mapFeatures;
+  features.edits.mapColor = "blue";
+  features.edits.borderSwitch = true;
+
+  //Messed up id
+  const response4 = await request(app).put('/api/updateMapFeatures/'+ response3.body.map._id + '1').set('Cookie', response2.headers['set-cookie']).send(features);
+  expect(response4.statusCode).toBe(500);
+});
+  });
