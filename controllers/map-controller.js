@@ -22,8 +22,18 @@ createNewMap = async (req, res) => {
     }
 
     body.mapFeatures = {
-        "ADV" : [],
-        "DP" : [],
+        "ADV": [],
+        "DP": [],
+        "edits": {
+          "borderSwitch": false,
+          "borderWidth": 1,
+          "borderColor": "#000000",
+          "regionSwitch": false,
+          "regionNameColor": "#000000",
+          "backgroundColor": "#ffffff",
+          "center": [0, 0],
+          "zoom": 1
+        }
     }
 
     const map = new Map(body);
@@ -134,10 +144,6 @@ updateMap = async (req, res) => {
 updateMapFeatures = async (req, res) => {
     let features = req.body.features;
     console.log("updateMapFeatures features: " + features);
-    let selectedOption = req.body.selectedOption;
-    console.log("updateMapFeatures selectedOption: " + selectedOption);
-    features = JSON.parse(features);
-    console.log("updateMapFeatures features: " + features);
 
 
     try {
@@ -156,15 +162,8 @@ updateMapFeatures = async (req, res) => {
         if (user && user._id.toString() === req.userId) {
             console.log("User verified. Proceeding to update mapFeatures.");
 
-            if (selectedOption === "Additional Region Data") {
-                console.log("ADV");
-                features.DP = map.mapFeatures.DP;
-                map.mapFeatures = features;
-            }else {
-                console.log("DP");
-                features.ADV = map.mapFeatures.ADV;
-                map.mapFeatures = features;
-            }
+            map.mapFeatures = features;
+            
             await map.save();
 
             console.log("SUCCESS!!! Map features updated.");
