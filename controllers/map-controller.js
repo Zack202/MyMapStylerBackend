@@ -103,7 +103,7 @@ updateMap = async (req, res) => {
             console.log("User verified. Proceeding to update the map.");
             if(diff.name){
                 // Create the update object based on the diff
-                const nameChanges = diff.diff.name;
+                const nameChanges = diff.name;
     
                 // Update the 'name' field in the map object
                 map.name = nameChanges[nameChanges.length - 1]; // Assuming the last value in the array is the updated value
