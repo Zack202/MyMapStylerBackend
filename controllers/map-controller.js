@@ -68,13 +68,19 @@ updateMap = async (req, res) => {
         if (user && user._id.toString() === req.userId) {
             console.log("User verified. Proceeding to update the map.");
 
-                        // Create the update object based on the diff
-                        const nameChanges = diff.diff.name;
+            if(diff.diff.name){
+            // Create the update object based on the diff
+            const nameChanges = diff.diff.name;
 
-                        // Update the 'name' field in the map object
-                        map.name = nameChanges[nameChanges.length - 1]; // Assuming the last value in the array is the updated value
+            // Update the 'name' field in the map object
+            map.name = nameChanges[nameChanges.length - 1]; // Assuming the last value in the array is the updated value
+            }
+
+            if(diff.diff.published){ map.published = true;
+            console.log("we are hereeeeeee");
+            }
             
-                        await map.save();
+            await map.save();
 
             console.log("SUCCESS!!! Map updated.");
             return res.status(200).json({
@@ -182,7 +188,11 @@ getMapPairs = async (req, res) => {
                         let list = maps[key];
                         let pair = {
                             _id: list._id,
-                            name: list.name
+                            name: list.name,
+                            published: list.published,
+                            likes: list.likes,
+                            dislikes: list.dislikes,
+                            view: list.views
                         };
                         pairs.push(pair);
                     }
