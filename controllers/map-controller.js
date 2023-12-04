@@ -21,20 +21,21 @@ createNewMap = async (req, res) => {
             error: 'Missing required fields: name, userName, ownerEmail, mapGeometry, mapType, description'
         });
     }
-
-    body.mapFeatures = {
-        "ADV": [],
-        "DP": [],
-        "edits": {
-            "mapColor": "maroon",
-          "borderSwitch": false,
-          "borderWidth": 1,
-          "borderColor": "#000000",
-          "regionSwitch": false,
-          "regionNameColor": "#000000",
-          "backgroundColor": "#ffffff",
-          "center": [0, 0],
-          "zoom": 1
+    if (body.mapFeatures == null) {
+        body.mapFeatures = {
+            "ADV": [],
+            "DP": [],
+            "edits": {
+                "mapColor": "maroon",
+            "borderSwitch": false,
+            "borderWidth": 1,
+            "borderColor": "#000000",
+            "regionSwitch": false,
+            "regionNameColor": "#000000",
+            "backgroundColor": "#ffffff",
+            "center": [0, 0],
+            "zoom": 1
+            }
         }
     }
 
