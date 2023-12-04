@@ -141,6 +141,7 @@ updateMap = async (req, res) => {
     }
 };
 
+
 updateMapFeatures = async (req, res) => {
     let features = req.body.features;
     console.log("updateMapFeatures features: " + features);
