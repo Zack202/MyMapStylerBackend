@@ -363,8 +363,11 @@ updateUserInfo = async (req, res) => {
         const user = await User.findOne({ _id: userId });
         console.log("THE loggedInUser: " + user);
 
-        user.firstName = body.firstName;
-        user.lastName = body.lastName;
+        user.firstName = body.data.firstName;
+        user.lastName = body.data.lastName;
+
+        console.log(body)
+        console.log(body.data.firstName)
 
         await user.save();
 
