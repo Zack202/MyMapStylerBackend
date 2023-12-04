@@ -100,14 +100,19 @@ updateMap = async (req, res) => {
         const user = await User.findOne({ email: map.ownerEmail }).exec();
         if (user && user._id.toString() === req.userId) {
             console.log("User verified. Proceeding to update the map.");
-
-                        // Create the update object based on the diff
-                        const nameChanges = diff.diff.name;
-
-                        // Update the 'name' field in the map object
-                        map.name = nameChanges[nameChanges.length - 1]; // Assuming the last value in the array is the updated value
+            if(diff.name){
+                // Create the update object based on the diff
+                const nameChanges = diff.diff.name;
+    
+                // Update the 'name' field in the map object
+                map.name = nameChanges[nameChanges.length - 1]; // Assuming the last value in the array is the updated value
+            }
+            if(diff.published){ 
+                map.published = true;
+                console.log("we are hereeeeeee");
+            }
             
-                        await map.save();
+            await map.save();
 
             console.log("SUCCESS!!! Map updated.");
             return res.status(200).json({
