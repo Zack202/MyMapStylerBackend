@@ -25,6 +25,7 @@ createNewMap = async (req, res) => {
         "ADV": [],
         "DP": [],
         "edits": {
+            "mapColor": "maroon",
           "borderSwitch": false,
           "borderWidth": 1,
           "borderColor": "#000000",
@@ -163,7 +164,7 @@ updateMapFeatures = async (req, res) => {
             console.log("User verified. Proceeding to update mapFeatures.");
 
             map.mapFeatures = features;
-            
+
             await map.save();
 
             console.log("SUCCESS!!! Map features updated.");
