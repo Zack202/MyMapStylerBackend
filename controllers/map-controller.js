@@ -147,54 +147,6 @@ updateMapFeatures = async (req, res) => {
     }
 };
 
-updateMapFeaturesById = async (req, res) => {
-    //const { mapId } = req.params;
-    const diff = req.body.diff;
-
-    try {
-        const map = await Map.findOne({ _id: req.params.id });
-        console.log("Map found: " + JSON.stringify(map));
-
-        if (!map) {
-            return res.status(404).json({
-                message: 'Map not found!',
-                success: false,
-            });
-        }
-
-        const user = await User.findOne({ email: map.ownerEmail }).exec();
-        if (user && user._id.toString() === req.userId) {
-            console.log("User verified. Proceeding to update mapFeatures.");
-
-            //Apply diff
-            //const patchedMapFeatures = jsonDiff.patch(map.mapFeatures, diff);
-
-            //Update mapFeatures
-            map.mapFeatures = diff//patchedMapFeatures;
-            await map.save();
-
-            console.log("SUCCESS!!! Map features updated.");
-            return res.status(200).json({
-                success: true,
-                id: map._id,
-                message: 'Map features updated!',
-            });
-        } else {
-            console.log("User not found or unauthorized.");
-            return res.status(404).json({
-                message: 'User not found or unauthorized!',
-                success: false,
-            });
-        }
-    } catch (error) {
-        console.log("FAILURE: " + JSON.stringify(error));
-        return res.status(500).json({
-            error,
-            message: 'Internal server error!',
-        });
-    }
-};
-
 getMapById = async (req, res) => {
     console.log("find map with id: " + JSON.stringify(req.params.id));
     await Map.findById({_id: req.params.id}, (err, mapcan) => {
@@ -320,6 +272,5 @@ module.exports = {
    getMapById,
    getMapPairsPublished,
    deleteMap,
-   updateMapFeatures,
-   updateMapFeaturesById
+   updateMapFeatures
 }
