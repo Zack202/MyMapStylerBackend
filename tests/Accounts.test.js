@@ -329,15 +329,4 @@ describe('ForgotPassword Tests', () => {
     });
   });
 
-// describe('Update Account Tests', () => {
-//   test('user wants to change both fields', async () => {
-//     const currentAccount = {
-//       firstName: 'john',
-//       lastName: 'doe',
-//       userName: 'johndoe', 
-//     };
-    
-//     const response1 = (await request(app).put('/auth/profile/:id')).send(currentAccount.userName, 'saul', 'goodman');
-//     expect(response1.statusCode).toBe(200);
-//   })
-// });
+>>>>>>>>> Temporary merge branch 2

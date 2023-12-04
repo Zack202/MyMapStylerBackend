@@ -5,7 +5,7 @@ const jsonDiff = require('json-diff');
 
 createNewMap = async (req, res) => {
     const body = req.body;
-    console.log("createMap body: " + JSON.stringify(body));
+    // console.log("createMap body: " + JSON.stringify(body));
     
     if (Object.keys(body).length === 0) {
         return res.status(400).json({
@@ -13,11 +13,12 @@ createNewMap = async (req, res) => {
             errorMessage: 'You must provide a Map',
         })
     }
-    const { name, userName, ownerEmail, mapGeometry, mapType } = req.body;
-    if (!name || !userName || !ownerEmail || !mapGeometry || !mapType) {
+    const { name, userName, ownerEmail, mapGeometry, mapType, description } = req.body;
+
+    if (!name || !userName || !ownerEmail || !mapGeometry || !mapType || !description) {
         return res.status(400).json({
             success: false,
-            error: 'Missing required fields: name, userName, ownerEmail, mapGeometry, mapType'
+            error: 'Missing required fields: name, userName, ownerEmail, mapGeometry, mapType, description'
         });
     }
 
@@ -100,32 +101,20 @@ updateMap = async (req, res) => {
         if (user && user._id.toString() === req.userId) {
             console.log("User verified. Proceeding to update the map.");
 
-            const patch = createPatch(diff);
+                        // Create the update object based on the diff
+                        const nameChanges = diff.diff.name;
 
-            try {
-                const result = await Map.updateOne({ _id: map._id }, patch);
+                        // Update the 'name' field in the map object
+                        map.name = nameChanges[nameChanges.length - 1]; // Assuming the last value in the array is the updated value
             
-                if (result.nModified === 0) {
-                    // Document not found or no changes were made
-                    return res.status(404).json({
-                        message: 'Map not found or no changes applied!',
-                        success: false,
-                    });
-                }
-            
-                console.log("SUCCESS!!! Map updated.");
-                return res.status(200).json({
-                    success: true,
-                    id: map._id,
-                    message: 'Map updated!',
-                });
-            } catch (error) {
-                console.log("FAILURE: " + JSON.stringify(error));
-                return res.status(500).json({
-                    error,
-                    message: 'Internal server error!',
-                });
-            }
+                        await map.save();
+
+            console.log("SUCCESS!!! Map updated.");
+            return res.status(200).json({
+                success: true,
+                id: map._id,
+                message: 'Map updated!',
+            });
         } else {
             console.log("User not found or unauthorized.");
             return res.status(404).json({
@@ -195,7 +184,7 @@ getMapById = async (req, res) => {
         if (err) {
             return res.status(400).json({success: false, error: err});
         }
-        console.log("Found map: " + JSON.stringify(mapcan));
+        console.log("Found map: " + JSON.stringify(mapcan.name));
         return res.status(200).json({success: true, map: mapcan});
     }).catch(err => console.log(err))
 }
@@ -225,7 +214,13 @@ getMapPairs = async (req, res) => {
                         let list = maps[key];
                         let pair = {
                             _id: list._id,
-                            name: list.name
+                            name: list.name,
+                            description: list.description,
+                            published: list.published,
+                            likes: list.likes,
+                            dislikes: list.dislikes,
+                            view: list.views,
+                            userName: list.userName,
                         };
                         pairs.push(pair);
                     }

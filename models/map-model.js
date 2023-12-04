@@ -5,6 +5,7 @@ const ObjectId = Schema.Types.ObjectId
 const MapSchema = new mongoose.Schema(
     {
         name: { type: String, required: true },
+        description: {type: String, required: true},
         userName: {type:String,required: true},
         ownerEmail: { type: String, required: true },
         likes: {type:[String], required: false},
