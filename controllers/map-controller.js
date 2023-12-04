@@ -192,7 +192,8 @@ getMapPairs = async (req, res) => {
                             published: list.published,
                             likes: list.likes,
                             dislikes: list.dislikes,
-                            view: list.views
+                            view: list.views,
+                            userName: list.userName,
                         };
                         pairs.push(pair);
                     }
