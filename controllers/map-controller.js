@@ -5,7 +5,7 @@ const jsonDiff = require('json-diff');
 
 createNewMap = async (req, res) => {
     const body = req.body;
-    console.log("createMap body: " + JSON.stringify(body));
+    // console.log("createMap body: " + JSON.stringify(body));
     
     if (Object.keys(body).length === 0) {
         return res.status(400).json({
@@ -13,14 +13,14 @@ createNewMap = async (req, res) => {
             errorMessage: 'You must provide a Map',
         })
     }
-    const { name, userName, ownerEmail, mapGeometry, mapType } = req.body;
-    if (!name || !userName || !ownerEmail || !mapGeometry || !mapType) {
+    const { name, userName, ownerEmail, mapGeometry, mapType, description } = req.body;
+
+    if (!name || !userName || !ownerEmail || !mapGeometry || !mapType || !description) {
         return res.status(400).json({
             success: false,
-            error: 'Missing required fields: name, userName, ownerEmail, mapGeometry, mapType'
+            error: 'Missing required fields: name, userName, ownerEmail, mapGeometry, mapType, description'
         });
     }
-
     const map = new Map(body);
     console.log("map: " + map.toString());
     if (!map || typeof map.name === "undefined") {
@@ -189,6 +189,7 @@ getMapPairs = async (req, res) => {
                         let pair = {
                             _id: list._id,
                             name: list.name,
+                            description: list.description,
                             published: list.published,
                             likes: list.likes,
                             dislikes: list.dislikes,
