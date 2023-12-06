@@ -112,6 +112,21 @@ updateMap = async (req, res) => {
                 map.published = true;
                 console.log("we are hereeeeeee");
             }
+
+            if(diff.liked){
+                // check if user has liked the list and is trying to unlike it
+                if(map.likes.includes(user.userName)){
+                    let index = map.likes.indexOf(user.userName);
+                    map.likes.splice(index, 1);
+                } else {
+                    //check if user is liking the list that he has disliked
+                    if(map.dislikes.includes(user.userName)){
+                        let index = map.likes.indexOf(user.userName);
+                        map.likes.splice(index, 1);
+                    }
+                    map.likes.push(user.userName);
+                }
+            }
             
             await map.save();
 
