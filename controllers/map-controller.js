@@ -121,10 +121,25 @@ updateMap = async (req, res) => {
                 } else {
                     //check if user is liking the list that he has disliked
                     if(map.dislikes.includes(user.userName)){
+                        let index = map.dislikes.indexOf(user.userName);
+                        map.dislikes.splice(index, 1);
+                    }
+                    map.likes.push(user.userName);
+                }
+            }
+
+            if(diff.disliked){
+                // check if user has disliked the list and is trying to undislike it
+                if(map.dislikes.includes(user.userName)){
+                    let index = map.dislikes.indexOf(user.userName);
+                    map.dislikes.splice(index, 1);
+                } else {
+                    //check if user is disliking the list that he has liked
+                    if(map.likes.includes(user.userName)){
                         let index = map.likes.indexOf(user.userName);
                         map.likes.splice(index, 1);
                     }
-                    map.likes.push(user.userName);
+                    map.dislikes.push(user.userName);
                 }
             }
             
