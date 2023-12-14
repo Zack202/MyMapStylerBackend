@@ -13,7 +13,7 @@ createNewMap = async (req, res) => {
             errorMessage: 'You must provide a Map',
         })
     }
-    const { name, userName, ownerEmail, mapGeometry, mapType, description } = req.body;
+    const { name, userName, ownerEmail, mapGeometry, mapType, description, comments } = req.body;
 
     if (!name || !userName || !ownerEmail || !mapGeometry || !mapType || !description) {
         return res.status(400).json({
@@ -38,8 +38,8 @@ createNewMap = async (req, res) => {
             }
         }
     }
-
     const map = new Map(body);
+    map.comments.pop()
     console.log("map: " + map.toString());
     if (!map || typeof map.name === "undefined") {
         return res.status(400).json({ success: false, errorMessage: 'Poorly Formated Map', })
@@ -141,6 +141,10 @@ updateMap = async (req, res) => {
                     }
                     map.dislikes.push(user.userName);
                 }
+            }
+
+            if(diff.newComment){
+                map.comments.push(diff.newComment);
             }
             
             await map.save();
