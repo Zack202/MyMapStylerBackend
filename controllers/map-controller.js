@@ -261,6 +261,7 @@ getMapPairs = async (req, res) => {
                             dislikes: list.dislikes,
                             view: list.views,
                             userName: list.userName,
+                            ownerEmail: list.ownerEmail
                         };
                         pairs.push(pair);
                     }
@@ -279,14 +280,9 @@ getMapPairsPublished = async (req, res) => {
         const publishedMaps = await Map.find({ published: true });
 
         console.log("Sending the Map pairs.");
-        // Transform published maps to ID, NAME PAIRS
-        const pairs = publishedMaps.map(map => ({
-            _id: map._id,
-            name: map.name
-        }));
 
-        console.log(pairs);
-        return res.status(200).json({ success: true, idNamePairs: pairs });
+        console.log(publishedMaps);
+        return res.status(200).json({ success: true, idNamePairs: publishedMaps });
     } catch (error) {
         console.log("Error:", error);
         return res.status(500).json({ success: false, error: 'Internal server error' });
