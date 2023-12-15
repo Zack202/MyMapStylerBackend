@@ -99,7 +99,7 @@ updateMap = async (req, res) => {
         }
 
         const user = await User.findOne({ email: map.ownerEmail }).exec();
-        if (user && user._id.toString() === req.userId) {
+        if (user) {
             console.log("User verified. Proceeding to update the map.");
             if(diff.name){
                 // Create the update object based on the diff
@@ -261,7 +261,8 @@ getMapPairs = async (req, res) => {
                             dislikes: list.dislikes,
                             view: list.views,
                             userName: list.userName,
-                            ownerEmail: list.ownerEmail
+                            ownerEmail: list.ownerEmail,
+                            comments: list.comments
                         };
                         pairs.push(pair);
                     }
