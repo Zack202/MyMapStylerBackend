@@ -22,8 +22,15 @@ createNewMap = async (req, res) => {
         });
     }
     if (body.mapFeatures == null) {
+        //Populate the mapFeatures with default values
+        const regions = mapGeometry.features.map(feature => feature.properties.name);
+        const sanitizedRegions = regions.reduce((acc, region) => {
+            const sanitizedRegion = region.replace(/\./g, '');
+            acc[sanitizedRegion] = [];
+            return acc;
+          }, {});
         body.mapFeatures = {
-            "ADV": [],
+            "ADV": sanitizedRegions,
             "DP": [],
             "edits": {
                 "mapColor": "maroon",
