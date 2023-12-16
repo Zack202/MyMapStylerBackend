@@ -13,7 +13,7 @@ createNewMap = async (req, res) => {
             errorMessage: 'You must provide a Map',
         })
     }
-    const { name, userName, ownerEmail, mapGeometry, mapType, description } = req.body;
+    const { name, userName, ownerEmail, mapGeometry, mapType, description, comments } = req.body;
 
     if (!name || !userName || !ownerEmail || !mapGeometry || !mapType || !description) {
         return res.status(400).json({
@@ -45,8 +45,8 @@ createNewMap = async (req, res) => {
             }
         }
     }
-
     const map = new Map(body);
+    map.comments.pop()
     console.log("map: " + map.toString());
     if (!map || typeof map.name === "undefined") {
         return res.status(400).json({ success: false, errorMessage: 'Poorly Formated Map', })
@@ -106,7 +106,7 @@ updateMap = async (req, res) => {
         }
 
         const user = await User.findOne({ email: map.ownerEmail }).exec();
-        if (user && user._id.toString() === req.userId) {
+        if (user) {
             console.log("User verified. Proceeding to update the map.");
             if(diff.name){
                 // Create the update object based on the diff
@@ -118,6 +118,40 @@ updateMap = async (req, res) => {
             if(diff.published){ 
                 map.published = true;
                 console.log("we are hereeeeeee");
+            }
+
+            if(diff.liked){
+                // check if user has liked the list and is trying to unlike it
+                if(map.likes.includes(user.userName)){
+                    let index = map.likes.indexOf(user.userName);
+                    map.likes.splice(index, 1);
+                } else {
+                    //check if user is liking the list that he has disliked
+                    if(map.dislikes.includes(user.userName)){
+                        let index = map.dislikes.indexOf(user.userName);
+                        map.dislikes.splice(index, 1);
+                    }
+                    map.likes.push(user.userName);
+                }
+            }
+
+            if(diff.disliked){
+                // check if user has disliked the list and is trying to undislike it
+                if(map.dislikes.includes(user.userName)){
+                    let index = map.dislikes.indexOf(user.userName);
+                    map.dislikes.splice(index, 1);
+                } else {
+                    //check if user is disliking the list that he has liked
+                    if(map.likes.includes(user.userName)){
+                        let index = map.likes.indexOf(user.userName);
+                        map.likes.splice(index, 1);
+                    }
+                    map.dislikes.push(user.userName);
+                }
+            }
+
+            if(diff.newComment){
+                map.comments.push(diff.newComment);
             }
             
             await map.save();
@@ -234,6 +268,8 @@ getMapPairs = async (req, res) => {
                             dislikes: list.dislikes,
                             view: list.views,
                             userName: list.userName,
+                            ownerEmail: list.ownerEmail,
+                            comments: list.comments
                         };
                         pairs.push(pair);
                     }
@@ -252,14 +288,9 @@ getMapPairsPublished = async (req, res) => {
         const publishedMaps = await Map.find({ published: true });
 
         console.log("Sending the Map pairs.");
-        // Transform published maps to ID, NAME PAIRS
-        const pairs = publishedMaps.map(map => ({
-            _id: map._id,
-            name: map.name
-        }));
 
-        console.log(pairs);
-        return res.status(200).json({ success: true, idNamePairs: pairs });
+        console.log(publishedMaps);
+        return res.status(200).json({ success: true, idNamePairs: publishedMaps });
     } catch (error) {
         console.log("Error:", error);
         return res.status(500).json({ success: false, error: 'Internal server error' });
