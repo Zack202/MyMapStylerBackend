@@ -227,7 +227,8 @@ getMapPairs = async (req, res) => {
                             dislikes: list.dislikes,
                             view: list.views,
                             userName: list.userName,
-                            ownerEmail: list.ownerEmail
+                            ownerEmail: list.ownerEmail,
+                            createdAt: list.createdAt
                         };
                         pairs.push(pair);
                     }
