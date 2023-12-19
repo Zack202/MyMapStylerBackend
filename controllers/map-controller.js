@@ -156,6 +156,10 @@ updateMap = async (req, res) => {
             if(diff.newComment){
                 map.comments.push(diff.newComment);
             }
+
+            if(diff.description){
+                map.description = diff.description[diff.description.length - 1];
+            }
             
             await map.save();
 
