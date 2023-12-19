@@ -111,6 +111,7 @@ updateMap = async (req, res) => {
         const user = await User.findOne({ email: map.ownerEmail }).exec();
         if (user) {
             console.log("User verified. Proceeding to update the map.");
+
             if(diff.name){
                 // Create the update object based on the diff
                 const nameChanges = diff.name;
@@ -155,6 +156,12 @@ updateMap = async (req, res) => {
 
             if(diff.newComment){
                 map.comments.push(diff.newComment);
+            }
+
+            if(diff.removeComment){
+                let index = map.comments.indexOf(diff.removeComment);
+                console.log("the index is", index);
+                map.comments.splice(index, 1);
             }
             
             await map.save();
