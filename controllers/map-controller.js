@@ -268,6 +268,7 @@ getMapPairs = async (req, res) => {
                         let pair = {
                             _id: list._id,
                             name: list.name,
+                            mapType: list.mapType,
                             description: list.description,
                             published: list.published,
                             likes: list.likes,
