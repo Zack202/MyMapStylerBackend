@@ -275,6 +275,7 @@ getMapPairs = async (req, res) => {
                             view: list.views,
                             userName: list.userName,
                             ownerEmail: list.ownerEmail,
+                            createdAt: list.createdAt,
                             comments: list.comments
                         };
                         pairs.push(pair);
