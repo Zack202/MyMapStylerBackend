@@ -22,8 +22,15 @@ createNewMap = async (req, res) => {
         });
     }
     if (body.mapFeatures == null) {
+        //Populate the mapFeatures with default values
+        const regions = mapGeometry.features.map(feature => feature.properties.name);
+        const sanitizedRegions = regions.reduce((acc, region) => {
+            const sanitizedRegion = region.replace(/\./g, '');
+            acc[sanitizedRegion] = [];
+            return acc;
+          }, {});
         body.mapFeatures = {
-            "ADV": [],
+            "ADV": sanitizedRegions,
             "DP": [],
             "edits": {
                 "mapColor": "maroon",
@@ -34,7 +41,10 @@ createNewMap = async (req, res) => {
             "regionNameColor": "#000000",
             "backgroundColor": "#ffffff",
             "center": [0, 0],
-            "zoom": 1
+            "zoom": 1,
+            "radius": 2,
+            "dotColor": "#000000",
+            "dotOpacity": 1,
             }
         }
     }
@@ -220,6 +230,9 @@ updateMapFeatures = async (req, res) => {
 
 getMapById = async (req, res) => {
     console.log("find map with id: " + JSON.stringify(req.params.id));
+    if (!req.params.id) {
+        return res.status(400).json({ success: false, error: 'You must provide a map id' })
+    }
     await Map.findById({_id: req.params.id}, (err, mapcan) => {
         if (err) {
             return res.status(400).json({success: false, error: err});
@@ -255,6 +268,7 @@ getMapPairs = async (req, res) => {
                         let pair = {
                             _id: list._id,
                             name: list.name,
+                            mapType: list.mapType,
                             description: list.description,
                             published: list.published,
                             likes: list.likes,
@@ -262,6 +276,7 @@ getMapPairs = async (req, res) => {
                             view: list.views,
                             userName: list.userName,
                             ownerEmail: list.ownerEmail,
+                            createdAt: list.createdAt,
                             comments: list.comments,
                             mapGeometry: list.mapGeometry,
                             mapFeatures: list.mapFeatures
