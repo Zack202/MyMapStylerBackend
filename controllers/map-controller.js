@@ -262,7 +262,9 @@ getMapPairs = async (req, res) => {
                             view: list.views,
                             userName: list.userName,
                             ownerEmail: list.ownerEmail,
-                            comments: list.comments
+                            comments: list.comments,
+                            mapGeometry: list.mapGeometry,
+                            mapFeatures: list.mapFeatures
                         };
                         pairs.push(pair);
                     }
