@@ -41,7 +41,10 @@ createNewMap = async (req, res) => {
             "regionNameColor": "#000000",
             "backgroundColor": "#ffffff",
             "center": [0, 0],
-            "zoom": 1
+            "zoom": 1,
+            "radius": 2,
+            "dotColor": "#000000",
+            "dotOpacity": 1,
             }
         }
     }
@@ -227,6 +230,9 @@ updateMapFeatures = async (req, res) => {
 
 getMapById = async (req, res) => {
     console.log("find map with id: " + JSON.stringify(req.params.id));
+    if (!req.params.id) {
+        return res.status(400).json({ success: false, error: 'You must provide a map id' })
+    }
     await Map.findById({_id: req.params.id}, (err, mapcan) => {
         if (err) {
             return res.status(400).json({success: false, error: err});
