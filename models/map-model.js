@@ -19,7 +19,7 @@ const MapSchema = new mongoose.Schema(
         mapCenter: {type: [Number], required: false},
         previousCreators: { type: [String], required: false},
         mapType: {type: Number, required: true},
-        comments: {type: [{ commentString: String, userName: String, likes: Number, dislikes: Number, date: Date}], required: false},
+        comments: {type: [{ commentString: String, userName: String, likes: Number, dislikes: Number, date: String}], required: false},
             
     },
     { timestamps: true,  collection: 'MapList' },

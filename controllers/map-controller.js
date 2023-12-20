@@ -8,17 +8,48 @@ createNewMap = async (req, res) => {
     // console.log("createMap body: " + JSON.stringify(body));
     
     if (Object.keys(body).length === 0) {
-        return res.status(400).json({
-            success: false,
-            errorMessage: 'You must provide a Map',
-        })
+        return res
+                .status(400)
+                .json({
+                    errorMessage: "You must provide a Map file."
+                });
     }
     const { name, userName, ownerEmail, mapGeometry, mapType, description, comments } = req.body;
 
+    if(!mapGeometry) {
+        return res
+                .status(400)
+                .json({
+                    errorMessage: "Missing required fields: Map File."
+                });
+    }
+    else if(!name) {
+        return res
+                .status(400)
+                .json({
+                    errorMessage: "Missing required fields: Map Name."
+                });
+    }
+    if(!description) {
+        return res
+                .status(400)
+                .json({
+                    errorMessage: "Missing required fields: Description."
+                });
+    }
+    if(!mapType) {
+        return res
+                .status(400)
+                .json({
+                    errorMessage: "Missing required fields: Map Type."
+                });
+    }
+    
     if (!name || !userName || !ownerEmail || !mapGeometry || !mapType || !description) {
-        return res.status(400).json({
-            success: false,
-            error: 'Missing required fields: name, userName, ownerEmail, mapGeometry, mapType, description'
+        return res
+        .status(400)
+        .json({
+            errorMessage: "Missing required fields"
         });
     }
     if (body.mapFeatures == null) {
@@ -41,7 +72,11 @@ createNewMap = async (req, res) => {
             "regionNameColor": "#000000",
             "backgroundColor": "#ffffff",
             "center": [0, 0],
-            "zoom": 1
+            "zoom": 1,
+            "radius": 2,
+            "dotColor": "#000000",
+            "dotOpacity": 1,
+            "thumbnail": null,
             }
         }
     }
@@ -108,6 +143,7 @@ updateMap = async (req, res) => {
         const user = await User.findOne({ email: map.ownerEmail }).exec();
         if (user) {
             console.log("User verified. Proceeding to update the map.");
+
             if(diff.name){
                 // Create the update object based on the diff
                 const nameChanges = diff.name;
@@ -122,36 +158,46 @@ updateMap = async (req, res) => {
 
             if(diff.liked){
                 // check if user has liked the list and is trying to unlike it
-                if(map.likes.includes(user.userName)){
-                    let index = map.likes.indexOf(user.userName);
+                if(map.likes.includes(diff.userName[0])){
+                    let index = map.likes.indexOf(diff.userName[0]);
                     map.likes.splice(index, 1);
                 } else {
                     //check if user is liking the list that he has disliked
-                    if(map.dislikes.includes(user.userName)){
-                        let index = map.dislikes.indexOf(user.userName);
+                    if(map.dislikes.includes(diff.userName[0])){
+                        let index = map.dislikes.indexOf(diff.userName[0]);
                         map.dislikes.splice(index, 1);
                     }
-                    map.likes.push(user.userName);
+                    map.likes.push(diff.userName[0]);
                 }
             }
 
             if(diff.disliked){
                 // check if user has disliked the list and is trying to undislike it
-                if(map.dislikes.includes(user.userName)){
-                    let index = map.dislikes.indexOf(user.userName);
+                if(map.dislikes.includes(diff.userName[0])){
+                    let index = map.dislikes.indexOf(diff.userName[0]);
                     map.dislikes.splice(index, 1);
                 } else {
                     //check if user is disliking the list that he has liked
-                    if(map.likes.includes(user.userName)){
-                        let index = map.likes.indexOf(user.userName);
+                    if(map.likes.includes(diff.userName[0])){
+                        let index = map.likes.indexOf(diff.userName[0]);
                         map.likes.splice(index, 1);
                     }
-                    map.dislikes.push(user.userName);
+                    map.dislikes.push(diff.userName[0]);
                 }
             }
-
+            
             if(diff.newComment){
                 map.comments.push(diff.newComment);
+            }
+
+            if(diff.removeComment){
+                let index = map.comments.indexOf(diff.removeComment);
+                console.log("the index is", index);
+                map.comments.splice(index, 1);
+            }
+
+            if(diff.description){
+                map.description = diff.description[diff.description.length - 1];
             }
             
             await map.save();
@@ -227,6 +273,9 @@ updateMapFeatures = async (req, res) => {
 
 getMapById = async (req, res) => {
     console.log("find map with id: " + JSON.stringify(req.params.id));
+    if (!req.params.id) {
+        return res.status(400).json({ success: false, error: 'You must provide a map id' })
+    }
     await Map.findById({_id: req.params.id}, (err, mapcan) => {
         if (err) {
             return res.status(400).json({success: false, error: err});
@@ -243,7 +292,7 @@ getMapPairs = async (req, res) => {
         async function asyncFindList(email) {
             console.log("find all maps owned by " + email);
             await Map.find({ ownerEmail: email }, (err, maps) => {
-                console.log("found Map: " + JSON.stringify(maps));
+                //console.log("found Map: " + JSON.stringify(maps));
                 if (err) {
                     return res.status(400).json({ success: false, error: err })
                 }
@@ -262,6 +311,7 @@ getMapPairs = async (req, res) => {
                         let pair = {
                             _id: list._id,
                             name: list.name,
+                            mapType: list.mapType,
                             description: list.description,
                             published: list.published,
                             likes: list.likes,
@@ -270,11 +320,13 @@ getMapPairs = async (req, res) => {
                             userName: list.userName,
                             ownerEmail: list.ownerEmail,
                             createdAt: list.createdAt,
-                            comments: list.comments
+                            comments: list.comments,
+                            mapGeometry: list.mapGeometry,
+                            mapFeatures: list.mapFeatures
                         };
                         pairs.push(pair);
                     }
-                    console.log(pairs)
+                    //console.log(pairs)
                     return res.status(200).json({ success: true, idNamePairs: pairs })
                 }
             }).catch(err => console.log(err))
@@ -290,7 +342,7 @@ getMapPairsPublished = async (req, res) => {
 
         console.log("Sending the Map pairs.");
 
-        console.log(publishedMaps);
+        //console.log(publishedMaps);
         return res.status(200).json({ success: true, idNamePairs: publishedMaps });
     } catch (error) {
         console.log("Error:", error);
