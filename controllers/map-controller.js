@@ -45,6 +45,7 @@ createNewMap = async (req, res) => {
             "radius": 2,
             "dotColor": "#000000",
             "dotOpacity": 1,
+            "thumbnail": null,
             }
         }
     }
