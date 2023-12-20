@@ -163,6 +163,10 @@ updateMap = async (req, res) => {
                 console.log("the index is", index);
                 map.comments.splice(index, 1);
             }
+
+            if(diff.description){
+                map.description = diff.description[diff.description.length - 1];
+            }
             
             await map.save();
 
