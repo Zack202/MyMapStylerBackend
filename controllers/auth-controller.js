@@ -346,19 +346,20 @@ updateUserInfo = async (req, res) => {
         const body = req.body;
         console.log("trying to update profile info")
         if (!body) {
-            return res.status(400).json({
-                success: false,
-                error: 'You must provide a body to update',
-            })
+            return res
+            .status(400)
+            .json({
+                errorMessage: "You must provide a body to update."
+            });
         }
 
         let userId = auth.verifyUser(req);
         if (!userId) {
-            return res.status(401).json({
-                loggedIn: false,
-                user: null,
-                errorMessage: "?"
-            })
+            return res
+            .status(400)
+            .json({
+                errorMessage: "Unable to Verify User."
+            });
         }
 
         const user = await User.findOne({ _id: userId });
@@ -383,10 +384,12 @@ updateUserInfo = async (req, res) => {
             message: 'Profile was updated'
         })
     } catch (err){
-        console.log(err)
-        res.status(402).json({
+        // console.log(err)
+        return res
+        .status(400)
+        .json({
             success: false,
-            message: "couldnt update account info"
+            errorMessage: "You must fill out both fields in order to update information."
         });
     }
 }
