@@ -76,6 +76,7 @@ createNewMap = async (req, res) => {
             "radius": 2,
             "dotColor": "#000000",
             "dotOpacity": 1,
+            "thumbnail": null,
             }
         }
     }
@@ -142,6 +143,7 @@ updateMap = async (req, res) => {
         const user = await User.findOne({ email: map.ownerEmail }).exec();
         if (user) {
             console.log("User verified. Proceeding to update the map.");
+
             if(diff.name){
                 // Create the update object based on the diff
                 const nameChanges = diff.name;
@@ -156,36 +158,42 @@ updateMap = async (req, res) => {
 
             if(diff.liked){
                 // check if user has liked the list and is trying to unlike it
-                if(map.likes.includes(user.userName)){
-                    let index = map.likes.indexOf(user.userName);
+                if(map.likes.includes(diff.userName[0])){
+                    let index = map.likes.indexOf(diff.userName[0]);
                     map.likes.splice(index, 1);
                 } else {
                     //check if user is liking the list that he has disliked
-                    if(map.dislikes.includes(user.userName)){
-                        let index = map.dislikes.indexOf(user.userName);
+                    if(map.dislikes.includes(diff.userName[0])){
+                        let index = map.dislikes.indexOf(diff.userName[0]);
                         map.dislikes.splice(index, 1);
                     }
-                    map.likes.push(user.userName);
+                    map.likes.push(diff.userName[0]);
                 }
             }
 
             if(diff.disliked){
                 // check if user has disliked the list and is trying to undislike it
-                if(map.dislikes.includes(user.userName)){
-                    let index = map.dislikes.indexOf(user.userName);
+                if(map.dislikes.includes(diff.userName[0])){
+                    let index = map.dislikes.indexOf(diff.userName[0]);
                     map.dislikes.splice(index, 1);
                 } else {
                     //check if user is disliking the list that he has liked
-                    if(map.likes.includes(user.userName)){
-                        let index = map.likes.indexOf(user.userName);
+                    if(map.likes.includes(diff.userName[0])){
+                        let index = map.likes.indexOf(diff.userName[0]);
                         map.likes.splice(index, 1);
                     }
-                    map.dislikes.push(user.userName);
+                    map.dislikes.push(diff.userName[0]);
                 }
             }
-
+            
             if(diff.newComment){
                 map.comments.push(diff.newComment);
+            }
+
+            if(diff.removeComment){
+                let index = map.comments.indexOf(diff.removeComment);
+                console.log("the index is", index);
+                map.comments.splice(index, 1);
             }
 
             if(diff.description){
@@ -312,7 +320,9 @@ getMapPairs = async (req, res) => {
                             userName: list.userName,
                             ownerEmail: list.ownerEmail,
                             createdAt: list.createdAt,
-                            comments: list.comments
+                            comments: list.comments,
+                            mapGeometry: list.mapGeometry,
+                            mapFeatures: list.mapFeatures
                         };
                         pairs.push(pair);
                     }
