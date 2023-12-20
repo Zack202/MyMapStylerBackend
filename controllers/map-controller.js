@@ -126,34 +126,34 @@ updateMap = async (req, res) => {
 
             if(diff.liked){
                 // check if user has liked the list and is trying to unlike it
-                if(map.likes.includes(user.userName)){
-                    let index = map.likes.indexOf(user.userName);
+                if(map.likes.includes(diff.userName[0])){
+                    let index = map.likes.indexOf(diff.userName[0]);
                     map.likes.splice(index, 1);
                 } else {
                     //check if user is liking the list that he has disliked
-                    if(map.dislikes.includes(user.userName)){
-                        let index = map.dislikes.indexOf(user.userName);
+                    if(map.dislikes.includes(diff.userName[0])){
+                        let index = map.dislikes.indexOf(diff.userName[0]);
                         map.dislikes.splice(index, 1);
                     }
-                    map.likes.push(user.userName);
+                    map.likes.push(diff.userName[0]);
                 }
             }
 
             if(diff.disliked){
                 // check if user has disliked the list and is trying to undislike it
-                if(map.dislikes.includes(user.userName)){
-                    let index = map.dislikes.indexOf(user.userName);
+                if(map.dislikes.includes(diff.userName[0])){
+                    let index = map.dislikes.indexOf(diff.userName[0]);
                     map.dislikes.splice(index, 1);
                 } else {
                     //check if user is disliking the list that he has liked
-                    if(map.likes.includes(user.userName)){
-                        let index = map.likes.indexOf(user.userName);
+                    if(map.likes.includes(diff.userName[0])){
+                        let index = map.likes.indexOf(diff.userName[0]);
                         map.likes.splice(index, 1);
                     }
-                    map.dislikes.push(user.userName);
+                    map.dislikes.push(diff.userName[0]);
                 }
             }
-
+            
             if(diff.newComment){
                 map.comments.push(diff.newComment);
             }
