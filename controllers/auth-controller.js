@@ -168,7 +168,9 @@ registerUser = async (req, res) => {
         console.log("new user saved: " + savedUser._id);
 
         // LOGIN THE USER
-        const token = auth.signToken(savedUser._id);
+        const userToLogin = await User.findOne({ userName: userName });
+
+        const token = auth.signToken(userToLogin._id);
         console.log("token:" + token);
 
         await res.cookie("token", token, {
@@ -177,11 +179,10 @@ registerUser = async (req, res) => {
         }).status(201).json({
             success: true,
             user: {
-                userName: savedUser.userName,
-                firstName: savedUser.firstName,
-                lastName: savedUser.lastName,  
-                email: savedUser.email
-                             
+                userName: userToLogin.userName,
+                firstName: userToLogin.firstName,
+                lastName: userToLogin.lastName,  
+                email: userToLogin.email              
             }
         })
 

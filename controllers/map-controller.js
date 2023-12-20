@@ -8,17 +8,48 @@ createNewMap = async (req, res) => {
     // console.log("createMap body: " + JSON.stringify(body));
     
     if (Object.keys(body).length === 0) {
-        return res.status(400).json({
-            success: false,
-            errorMessage: 'You must provide a Map',
-        })
+        return res
+                .status(400)
+                .json({
+                    errorMessage: "You must provide a Map file."
+                });
     }
     const { name, userName, ownerEmail, mapGeometry, mapType, description, comments } = req.body;
 
+    if(!mapGeometry) {
+        return res
+                .status(400)
+                .json({
+                    errorMessage: "Missing required fields: Map File."
+                });
+    }
+    else if(!name) {
+        return res
+                .status(400)
+                .json({
+                    errorMessage: "Missing required fields: Map Name."
+                });
+    }
+    if(!description) {
+        return res
+                .status(400)
+                .json({
+                    errorMessage: "Missing required fields: Description."
+                });
+    }
+    if(!mapType) {
+        return res
+                .status(400)
+                .json({
+                    errorMessage: "Missing required fields: Map Type."
+                });
+    }
+
     if (!name || !userName || !ownerEmail || !mapGeometry || !mapType || !description) {
-        return res.status(400).json({
-            success: false,
-            error: 'Missing required fields: name, userName, ownerEmail, mapGeometry, mapType, description'
+        return res
+        .status(400)
+        .json({
+            errorMessage: "Missing required fields"
         });
     }
     if (body.mapFeatures == null) {
