@@ -44,7 +44,7 @@ createNewMap = async (req, res) => {
                     errorMessage: "Missing required fields: Map Type."
                 });
     }
-
+    
     if (!name || !userName || !ownerEmail || !mapGeometry || !mapType || !description) {
         return res
         .status(400)
