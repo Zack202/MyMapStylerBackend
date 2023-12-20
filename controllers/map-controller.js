@@ -292,7 +292,7 @@ getMapPairs = async (req, res) => {
         async function asyncFindList(email) {
             console.log("find all maps owned by " + email);
             await Map.find({ ownerEmail: email }, (err, maps) => {
-                console.log("found Map: " + JSON.stringify(maps));
+                //console.log("found Map: " + JSON.stringify(maps));
                 if (err) {
                     return res.status(400).json({ success: false, error: err })
                 }
@@ -326,7 +326,7 @@ getMapPairs = async (req, res) => {
                         };
                         pairs.push(pair);
                     }
-                    console.log(pairs)
+                    //console.log(pairs)
                     return res.status(200).json({ success: true, idNamePairs: pairs })
                 }
             }).catch(err => console.log(err))
@@ -342,7 +342,7 @@ getMapPairsPublished = async (req, res) => {
 
         console.log("Sending the Map pairs.");
 
-        console.log(publishedMaps);
+        //console.log(publishedMaps);
         return res.status(200).json({ success: true, idNamePairs: publishedMaps });
     } catch (error) {
         console.log("Error:", error);

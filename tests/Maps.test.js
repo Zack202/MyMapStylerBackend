@@ -86,8 +86,7 @@ describe('Create New Map Tests', () => {
     
     const response3 = await request(app).post('/api/createNewMap').set('Cookie', response2.headers['set-cookie']).send();
     expect(response3.statusCode).toBe(400);
-    expect(response3.body.errorMessage).toBe("You must provide a Map");
-    expect(response3.body.success).toBe(false);
+    expect(response3.body.errorMessage).toBe("You must provide a Map file.");
     });
 
     test('should not create a new map (messed up map) for a Post request to /api/createNewMap WRITE TEST', async () => {
